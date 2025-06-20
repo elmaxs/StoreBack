@@ -1,0 +1,20 @@
+﻿using Store.Core.Enums;
+
+namespace Store.DataAccess.Entities
+{
+    public class UserEntity
+    {
+        public Guid Id { get; set; }
+
+        public string FullName { get; set; } = null!;
+        public string Username { get; set; } = null!;
+        public string HashedPassword { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string PhoneNumber { get; set; } = null!;
+
+        public UserRole Role { get; set; } = UserRole.Customer;
+        public DateTime CreatedAt { get; set; }
+
+        public ICollection<OrderEntity> Orders { get; set; } = new List<OrderEntity>();
+    }
+}
