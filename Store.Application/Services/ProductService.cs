@@ -1,6 +1,6 @@
 ﻿using Store.Application.Abstractions;
-using Store.Contracts.Request.ProductDTO;
-using Store.Contracts.Response.ProductDTO;
+using Store.Contracts.AdminContracts.Request.ProductDTO;
+using Store.Contracts.AdminContracts.Response.ProductDTO;
 using Store.Core.Abstractions.Repository;
 using Store.Core.Exceptions;
 using Store.Core.Models;
@@ -18,7 +18,7 @@ namespace Store.Application.Services
             _categoryRepository = categoryRepository;
         }
 
-        public async Task<Guid> CreateProduct(CreateProductDTO productDTO)
+        public async Task<Guid> CreateProduct(AdminCreateProductDTO productDTO)
         {
             if (productDTO is null)
                 throw new BadDataDTO(ErrorMessages.BadDataDTO);
@@ -45,13 +45,25 @@ namespace Store.Application.Services
             return await _productRepository.Delete(id);
         }
 
-        public async Task<IEnumerable<ReadProductDTO>> GetAllProducts()
+        public async Task<IEnumerable<Product>>? GetProductsByCategoryId(Guid categoryId)
+        {
+            if (categoryId == Guid.Empty)
+                throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
+
+            var products = await _productRepository.GetByCategoryId(categoryId);
+            if (products is null)
+                throw new NotFound(ErrorMessages.ProductNotFound);
+
+            return products;
+        }
+
+        public async Task<IEnumerable<AdminReadProductDTO>> GetAllProducts()
         {
             var products = await _productRepository.GetAll();
             if (products is null)
                 throw new NotFound(ErrorMessages.ProductNotFound);
 
-            var productsDTO = products.Select(p => new ReadProductDTO
+            var productsDTO = products.Select(p => new AdminReadProductDTO
             (
                 p.Id,
                 p.CategoryId,
@@ -66,7 +78,7 @@ namespace Store.Application.Services
             return productsDTO;
         }
 
-        public async Task<ReadProductDTO> GetProductById(Guid id)
+        public async Task<AdminReadProductDTO> GetProductById(Guid id)
         {
             if (id == Guid.Empty)
                 throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
@@ -75,7 +87,7 @@ namespace Store.Application.Services
             if (product is null)
                 throw new NotFound(ErrorMessages.ProductNotFound);
 
-            var productDTO = new ReadProductDTO(
+            var productDTO = new AdminReadProductDTO(
                 product.Id,
                 product.CategoryId,
                 product.Name,
@@ -88,7 +100,7 @@ namespace Store.Application.Services
             return productDTO;
         }
 
-        public async Task<Guid> UpdateProduct(Guid id, UpdateProductDTO productDTO)
+        public async Task<Guid> UpdateProduct(Guid id, AdminUpdateProductDTO productDTO)
         {
             if (productDTO is null)
                 throw new BadDataDTO(ErrorMessages.BadDataDTO);

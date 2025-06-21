@@ -1,6 +1,6 @@
 ﻿using Store.Application.Abstractions;
-using Store.Contracts.Request.OrderDTO;
-using Store.Contracts.Response.OrderDTO;
+using Store.Contracts.AdminContracts.Request.OrderDTO;
+using Store.Contracts.AdminContracts.Response.OrderDTO;
 using Store.Core.Abstractions.Repository;
 using Store.Core.Enums;
 using Store.Core.Exceptions;
@@ -17,7 +17,7 @@ namespace Store.Application.Services
             _orderRepository = orderRepository;
         }
 
-        public async Task<Guid> CreateOrder(CreateOrderDTO orderDTO)
+        public async Task<Guid> CreateOrder(AdminCreateOrderDTO orderDTO)
         {
             if (orderDTO is null)
                 throw new BadDataDTO(ErrorMessages.BadDataDTO);
@@ -42,7 +42,7 @@ namespace Store.Application.Services
             return await _orderRepository.Delete(id);
         }
 
-        public async Task<IEnumerable<ReadOrderDTO>> GetAllOrders()
+        public async Task<IEnumerable<AdminReadOrderDTO>> GetAllOrders()
         {
             var orders = await _orderRepository.GetAll();
             if (orders is null)
@@ -50,14 +50,14 @@ namespace Store.Application.Services
 
             var ordersDTO = orders.Select(o =>
             {
-                var orderItemDTO = o.Items.Select(oi => new OrderItemInOrderDTO(
+                var orderItemDTO = o.Items.Select(oi => new AdminOrderItemInOrderDTO(
                     oi.ProductId,
                     oi.Quantity,
                     oi.UnitPrice,
                     oi.TotalPrice
                     )).ToList();
 
-                var orderDTO = new ReadOrderDTO(o.Id, o.UserId, o.CreatedAt, o.TotalPrice, (int)o.Status, orderItemDTO);
+                var orderDTO = new AdminReadOrderDTO(o.Id, o.UserId, o.CreatedAt, o.TotalPrice, (int)o.Status, orderItemDTO);
 
                 return orderDTO;
             }).ToList();
@@ -65,7 +65,7 @@ namespace Store.Application.Services
             return ordersDTO;
         }
 
-        public async Task<ReadOrderDTO> GetOrderById(Guid id)
+        public async Task<AdminReadOrderDTO> GetOrderById(Guid id)
         {
             if (id == Guid.Empty)
                 throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
@@ -74,17 +74,17 @@ namespace Store.Application.Services
             if (order is null)
                 throw new NotFound(ErrorMessages.OrderNotFound);
 
-            var orderItemDTO = order.Items.Select(oi => new OrderItemInOrderDTO(
+            var orderItemDTO = order.Items.Select(oi => new AdminOrderItemInOrderDTO(
                     oi.ProductId,
                     oi.Quantity,
                     oi.UnitPrice,
                     oi.TotalPrice
                     )).ToList();
 
-            return new ReadOrderDTO(order.Id, order.UserId, order.CreatedAt, order.TotalPrice, (int)order.Status, orderItemDTO);
+            return new AdminReadOrderDTO(order.Id, order.UserId, order.CreatedAt, order.TotalPrice, (int)order.Status, orderItemDTO);
         }
 
-        public async Task<Guid> UpdateOrder(Guid id, UpdateOrderDTO orderDTO)
+        public async Task<Guid> UpdateOrder(Guid id, AdminUpdateOrderDTO orderDTO)
         {
             if (id == Guid.Empty)
                 throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);

@@ -1,14 +1,14 @@
-﻿using Store.Contracts.Request.UserDTO;
-using Store.Contracts.Response.UserDTO;
+﻿using Store.Contracts.AdminContracts.Request.UserDTO;
+using Store.Contracts.AdminContracts.Response.UserDTO;
 
 namespace Store.Application.Abstractions
 {
     public interface IUserService
     {
-        Task<Guid> CreateUser(CreateUserDTO userDTO);
-        Task<IEnumerable<ReadUserDTO>> GetAllUsers();
-        Task<ReadUserDTO> GetUserById(Guid id);
-        Task<Guid> UpdateUser(UpdateUserDTO userDTO);
+        Task<Guid> CreateUser(AdminCreateUserDTO userDTO);
+        Task<IEnumerable<AdminReadUserDTO>> GetAllUsers();
+        Task<AdminReadUserDTO> GetUserById(Guid id);
+        Task<Guid> UpdateUser(AdminUpdateUserDTO userDTO);
         Task<Guid> DeleteUser(Guid id);
     }
 }

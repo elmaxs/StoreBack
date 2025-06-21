@@ -1,5 +1,5 @@
-﻿using Store.Contracts.Request.CategoryDTO;
-using Store.Contracts.Response.CategoryDTO;
+﻿using Store.Contracts.AdminContracts.Request.CategoryDTO;
+using Store.Contracts.AdminContracts.Response.CategoryDTO;
 using Store.Core.Abstractions.Repository;
 using Store.Core.Abstractions.Services;
 using Store.Core.Exceptions;
@@ -16,12 +16,12 @@ namespace Store.Application.Services
             _categoryRepository = categoryRepository;
         }
 
-        public async Task<Guid> CreateCategory(CreateCategoryDTO categoryDTO)
+        public async Task<Guid> CreateCategory(AdminCreateCategoryDTO categoryDTO)
         {
             var id = Guid.NewGuid();
             var countProductsInCategory = await _categoryRepository.GetCountProductInCategory(id);
 
-            var (category, error) = Category.CreateCategory(id, categoryDTO.Name, categoryDTO.ParentCategoryId, 
+            var (category, error) = Category.CreateCategory(id, categoryDTO.Name, categoryDTO.ParentCategoryId,
                 countProductsInCategory, new List<Product>(), new List<Category>());
 
             if (!string.IsNullOrEmpty(error))
@@ -38,32 +38,17 @@ namespace Store.Application.Services
             return await _categoryRepository.Delete(id);
         }
 
-        public async Task<IEnumerable<ReadCategoryDTO>> GetAllCategory()
+        public async Task<IEnumerable<AdminReadCategoryDTO>> GetAllCategory()
         {
             var categories = await _categoryRepository.GetAll();
             if (categories == null)
                 throw new NotFound(ErrorMessages.CategoryNotFound);
 
-            var dto = categories.Select(c => new ReadCategoryDTO
-            (
-                c.Id,
-                c.ParentCategoryId,
-                c.CategoryName,
-                c.Products.Select(p => new ProductInCategoryDTO(
-                    p.Id,
-                    p.Name
-                )).ToList(),
-
-                c.Subcategories.Select(sc => new SubcategoryDto(
-                    sc.Id,
-                    sc.CategoryName
-                )).ToList()
-            )).ToList();
-
+            var dto = categories.Select(MapToDto).ToList();
             return dto;
         }
 
-        public async Task<ReadCategoryDTO> GetCategoryById(Guid id)
+        public async Task<AdminReadCategoryDTO> GetCategoryById(Guid id)
         {
             if (id == Guid.Empty)
                 throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
@@ -72,26 +57,12 @@ namespace Store.Application.Services
             if (category == null)
                 throw new NotFound(ErrorMessages.CategoryNotFound);
 
-            var dto = new ReadCategoryDTO
-            (
-                category.Id,
-                category.ParentCategoryId ?? Guid.Empty,
-                category.CategoryName,
-                category.Products.Select(p => new ProductInCategoryDTO(
-                    p.Id,
-                    p.Name
-                )).ToList(),
-
-                category.Subcategories.Select(sc => new SubcategoryDto(
-                    sc.Id,
-                    sc.CategoryName
-                )).ToList()
-            );
+            var dto = MapToDto(category);
 
             return dto;
         }
 
-        public async Task<Guid> UpdateCategory(Guid id, UpdateCategoryDTO categoryDTO)
+        public async Task<Guid> UpdateCategory(Guid id, AdminUpdateCategoryDTO categoryDTO)
         {
             if (categoryDTO == null)
                 throw new BadDataDTO(ErrorMessages.BadDataDTO);
@@ -114,6 +85,21 @@ namespace Store.Application.Services
                 throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
 
             return await _categoryRepository.IsExists(id);
+        }
+
+        private AdminReadCategoryDTO MapToDto(Category c)
+        {
+            return new AdminReadCategoryDTO(
+                c.Id,
+                c.ParentCategoryId,
+                c.CategoryName,
+                c.Products.Select(p => new AdminProductInCategoryDTO(
+                    p.Id,
+                    p.Name
+                )).ToList(),
+
+                c.Subcategories.Select(MapToDto).ToList()
+            );
         }
     }
 }

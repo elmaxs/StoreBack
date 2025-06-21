@@ -1,14 +1,16 @@
-﻿using Store.Contracts.Request.ProductDTO;
-using Store.Contracts.Response.ProductDTO;
+﻿using Store.Contracts.AdminContracts.Request.ProductDTO;
+using Store.Contracts.AdminContracts.Response.ProductDTO;
+using Store.Core.Models;
 
 namespace Store.Application.Abstractions
 {
     public interface IProductService
     {
-        Task<Guid> CreateProduct(CreateProductDTO productDTO);
-        Task<IEnumerable<ReadProductDTO>> GetAllProducts();
-        Task<ReadProductDTO> GetProductById(Guid id);
-        Task<Guid> UpdateProduct(Guid id, UpdateProductDTO productDTO);
+        Task<Guid> CreateProduct(AdminCreateProductDTO productDTO);
+        Task<IEnumerable<AdminReadProductDTO>> GetAllProducts();
+        Task<AdminReadProductDTO> GetProductById(Guid id);
+        Task<Guid> UpdateProduct(Guid id, AdminUpdateProductDTO productDTO);
         Task<Guid> DeleteProduct(Guid id);
+        Task<IEnumerable<Product>>? GetProductsByCategoryId(Guid categoryId);
     }
 }

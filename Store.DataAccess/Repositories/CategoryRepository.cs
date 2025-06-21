@@ -50,13 +50,16 @@ namespace Store.DataAccess.Repositories
             var rootCategories = categoriesEntity.Where(c => c.ParentCategoryId == null);
 
             // Побудова всіх категорій рекурсивно
-            var result = rootCategories.Select(c => MapCategory(c, categoriesEntity)).ToList();
+            //все категории пока в мапинге не нужны(я сам загружаю все сразу вначале. И подкатегории и основные)
+            //если бы не грузил подкатегории, тогда пришлось бы отдавать все категории и там искать подкатегории через Where
+            //крч если бы в entity у меня не хранился отдельно список подкатегорий, пришлось передавать все категории и там сортировать
+            var result = rootCategories.Select(c => MapCategory(c)).ToList();//, categoriesEntity)).ToList();
 
             return result;
         }
 
         // Рекурсивна функція для створення Category з CategoryEntity
-        private Category MapCategory(CategoryEntity entity, List<CategoryEntity> allCategories)
+        private Category MapCategory(CategoryEntity entity)//, List<CategoryEntity> allCategories)
         {
             // Продукти поточної категорії
             var products = entity.Products.Select(p =>
@@ -67,7 +70,7 @@ namespace Store.DataAccess.Repositories
 
             // Підкатегорії поточної категорії (рекурсивно)
             var subcategories = entity.Subcategories.Select(sub =>
-                MapCategory(sub, allCategories)).ToList();
+                MapCategory(sub)).ToList();//, allCategories)).ToList();
 
             var (category, error) = Category.CreateCategory(
                 entity.Id,
@@ -93,13 +96,13 @@ namespace Store.DataAccess.Repositories
             if (categoryEntity is null)
                 return null;
 
-            // Додатково потрібно завантажити всі категорії для побудови дерева
-            var allCategories = await _context.Categories
-                .Include(c => c.Products)
-                .Include(c => c.Subcategories)
-                .ToListAsync();
+            //// Додатково потрібно завантажити всі категорії для побудови дерева
+            //var allCategories = await _context.Categories
+            //    .Include(c => c.Products)
+            //    .Include(c => c.Subcategories)
+            //    .ToListAsync();
 
-            var category = MapCategory(categoryEntity, allCategories);
+            var category = MapCategory(categoryEntity);//, allCategories);
 
             return category;
         }

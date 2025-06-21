@@ -1,6 +1,6 @@
 ﻿using Store.Application.Abstractions;
-using Store.Contracts.Request.OrderItemDTO;
-using Store.Contracts.Response.OrderItemDTO;
+using Store.Contracts.AdminContracts.Request.OrderItemDTO;
+using Store.Contracts.AdminContracts.Response.OrderItemDTO;
 using Store.Core.Abstractions.Repository;
 using Store.Core.Exceptions;
 using Store.Core.Models;
@@ -16,7 +16,7 @@ namespace Store.Application.Services
             _itemRepository = itemRepository;
         }
 
-        public async Task<Guid> CreateOrderItem(CreateOrderItemDTO orderItemDTO)
+        public async Task<Guid> CreateOrderItem(AdminCreateOrderItemDTO orderItemDTO)
         {
             if (orderItemDTO is null)
                 throw new ValidationException(ErrorMessages.BadDataDTO);
@@ -39,17 +39,17 @@ namespace Store.Application.Services
             return await _itemRepository.Delete(id);
         }
 
-        public async Task<IEnumerable<ReadOrderItemDTO>> GetAllOrderItem()
+        public async Task<IEnumerable<AdminReadOrderItemDTO>> GetAllOrderItem()
         {
             var orderItems = await _itemRepository.GetAll();
             if (orderItems is null)
                 throw new NotFound(ErrorMessages.OrderItemNotFound);
 
-            return orderItems.Select(oi => new ReadOrderItemDTO
+            return orderItems.Select(oi => new AdminReadOrderItemDTO
                 (oi.OrderId, oi.ProductId, oi.ProductName, oi.Quantity, oi.UnitPrice)).ToList();
         }
 
-        public async Task<ReadOrderItemDTO> GetOrderItemById(Guid id)
+        public async Task<AdminReadOrderItemDTO> GetOrderItemById(Guid id)
         {
             if (id == Guid.Empty)
                 throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
@@ -58,11 +58,11 @@ namespace Store.Application.Services
             if (orderItem is null)
                 throw new NotFound(ErrorMessages.OrderItemNotFound);
 
-            return new ReadOrderItemDTO(orderItem.OrderId, orderItem.ProductId, orderItem.ProductName,
+            return new AdminReadOrderItemDTO(orderItem.OrderId, orderItem.ProductId, orderItem.ProductName,
                 orderItem.Quantity, orderItem.UnitPrice);
         }
 
-        public async Task<Guid> UpdateOrderItem(Guid id, UpdateOrderItemDTO orderItemDTO)
+        public async Task<Guid> UpdateOrderItem(Guid id, AdminUpdateOrderItemDTO orderItemDTO)
         {
             if (id == Guid.Empty)
                 throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
