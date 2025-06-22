@@ -1,9 +1,9 @@
 ﻿using Store.Contracts.AdminContracts.Request.UserDTO;
 using Store.Contracts.AdminContracts.Response.UserDTO;
 
-namespace Store.Application.Abstractions
+namespace Store.Application.Abstractions.Admin
 {
-    public interface IUserService
+    public interface IAdminUserService
     {
         Task<Guid> CreateUser(AdminCreateUserDTO userDTO);
         Task<IEnumerable<AdminReadUserDTO>> GetAllUsers();

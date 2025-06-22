@@ -2,9 +2,8 @@ using Store.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Store.Core.Abstractions.Repository;
 using Store.DataAccess.Repositories;
-using Store.Core.Abstractions.Services;
-using Store.Application.Services;
-using Store.Application.Abstractions;
+using Store.Application.Abstractions.Admin;
+using Store.Application.Services.Admin;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,13 +21,13 @@ builder.Services.AddDbContext<OnlineStoreDbContext>(
     options => options.UseNpgsql(connectionString + ";TrustServerCertificate=True"));
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IAdminCategoryService, AdminCategoryService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IAdminOrderService, AdminOrderService>();
 builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
-builder.Services.AddScoped<IOrderItemService, OrderItemService>();
+builder.Services.AddScoped<IAdminOrderItemService, AdminOrderItemService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IAdminProductService, AdminProductService>();
 
 builder.Services.AddCors(options =>
 {

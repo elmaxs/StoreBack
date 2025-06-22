@@ -1,9 +1,9 @@
 ﻿using Store.Contracts.AdminContracts.Request.CategoryDTO;
 using Store.Contracts.AdminContracts.Response.CategoryDTO;
 
-namespace Store.Core.Abstractions.Services
+namespace Store.Application.Abstractions.Admin
 {
-    public interface ICategoryService
+    public interface IAdminCategoryService
     {
         Task<Guid> CreateCategory(AdminCreateCategoryDTO categoryDTO);
         Task<IEnumerable<AdminReadCategoryDTO>> GetAllCategory();

@@ -1,18 +1,18 @@
-﻿using Store.Application.Abstractions;
+﻿using Store.Application.Abstractions.Admin;
 using Store.Contracts.AdminContracts.Request.ProductDTO;
 using Store.Contracts.AdminContracts.Response.ProductDTO;
 using Store.Core.Abstractions.Repository;
 using Store.Core.Exceptions;
 using Store.Core.Models;
 
-namespace Store.Application.Services
+namespace Store.Application.Services.Admin
 {
-    public class ProductService : IProductService
+    public class AdminProductService : IAdminProductService
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
 
-        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository)
+        public AdminProductService(IProductRepository productRepository, ICategoryRepository categoryRepository)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
@@ -43,18 +43,6 @@ namespace Store.Application.Services
                 throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
 
             return await _productRepository.Delete(id);
-        }
-
-        public async Task<IEnumerable<Product>>? GetProductsByCategoryId(Guid categoryId)
-        {
-            if (categoryId == Guid.Empty)
-                throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
-
-            var products = await _productRepository.GetByCategoryId(categoryId);
-            if (products is null)
-                throw new NotFound(ErrorMessages.ProductNotFound);
-
-            return products;
         }
 
         public async Task<IEnumerable<AdminReadProductDTO>> GetAllProducts()

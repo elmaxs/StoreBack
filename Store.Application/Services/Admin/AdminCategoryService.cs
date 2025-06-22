@@ -1,17 +1,17 @@
-﻿using Store.Contracts.AdminContracts.Request.CategoryDTO;
+﻿using Store.Application.Abstractions.Admin;
+using Store.Contracts.AdminContracts.Request.CategoryDTO;
 using Store.Contracts.AdminContracts.Response.CategoryDTO;
 using Store.Core.Abstractions.Repository;
-using Store.Core.Abstractions.Services;
 using Store.Core.Exceptions;
 using Store.Core.Models;
 
-namespace Store.Application.Services
+namespace Store.Application.Services.Admin
 {
-    public class CategoryService : ICategoryService
+    public class AdminCategoryService : IAdminCategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
 
-        public CategoryService(ICategoryRepository categoryRepository)
+        public AdminCategoryService(ICategoryRepository categoryRepository)
         {
             _categoryRepository = categoryRepository;
         }

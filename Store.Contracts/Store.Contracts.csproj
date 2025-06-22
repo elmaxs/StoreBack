@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="UserContracts\Request\" />
-    <Folder Include="UserContracts\Response\" />
   </ItemGroup>
 
 </Project>

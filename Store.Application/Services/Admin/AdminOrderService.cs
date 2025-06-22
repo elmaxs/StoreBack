@@ -1,4 +1,4 @@
-﻿using Store.Application.Abstractions;
+﻿using Store.Application.Abstractions.Admin;
 using Store.Contracts.AdminContracts.Request.OrderDTO;
 using Store.Contracts.AdminContracts.Response.OrderDTO;
 using Store.Core.Abstractions.Repository;
@@ -6,13 +6,13 @@ using Store.Core.Enums;
 using Store.Core.Exceptions;
 using Store.Core.Models;
 
-namespace Store.Application.Services
+namespace Store.Application.Services.Admin
 {
-    public class OrderService : IOrderService
+    public class AdminOrderService : IAdminOrderService
     {
         private readonly IOrderRepository _orderRepository;
 
-        public OrderService(IOrderRepository orderRepository)
+        public AdminOrderService(IOrderRepository orderRepository)
         {
             _orderRepository = orderRepository;
         }

@@ -107,6 +107,17 @@ namespace Store.DataAccess.Repositories
             return category;
         }
 
+        public async Task<Category> TreeSelected(Guid currentCategoryId)
+        {
+            var categoryEntity = _context.Categories.FirstOrDefault(c => c.Id == currentCategoryId);
+            if (categoryEntity is null)
+                return null;
+
+            var category = MapCategory(categoryEntity);
+
+            return category;
+        }
+
         public async Task<int> GetCountProductInCategory(Guid categoryId)
         {
             var categoryEntity = await _context.Categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.Id == categoryId);

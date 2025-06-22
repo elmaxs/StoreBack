@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Store.Application.Abstractions;
+using Store.Application.Abstractions.Admin;
 using Store.Contracts.AdminContracts.Request.OrderItemDTO;
 using Store.Contracts.AdminContracts.Response.OrderItemDTO;
 using Store.Core.Exceptions;
@@ -11,9 +11,9 @@ namespace Store.API.Controllers.Admin
     [ApiController]
     public class AdminOrderItemController : ControllerBase
     {
-        private readonly IOrderItemService _orderItemService;
+        private readonly IAdminOrderItemService _orderItemService;
 
-        public AdminOrderItemController(IOrderItemService orderItemService)
+        public AdminOrderItemController(IAdminOrderItemService orderItemService)
         {
             _orderItemService = orderItemService;
         }

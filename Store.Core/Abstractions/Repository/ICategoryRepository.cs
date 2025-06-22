@@ -12,5 +12,6 @@ namespace Store.Core.Abstractions.Repository
 
         Task<int> GetCountProductInCategory(Guid categoryId);
         Task<bool> IsExists(Guid id);
+        Task<Category> TreeSelected(Guid currentCategoryId);
     }
 }

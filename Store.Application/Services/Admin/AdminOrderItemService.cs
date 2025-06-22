@@ -1,17 +1,17 @@
-﻿using Store.Application.Abstractions;
+﻿using Store.Application.Abstractions.Admin;
 using Store.Contracts.AdminContracts.Request.OrderItemDTO;
 using Store.Contracts.AdminContracts.Response.OrderItemDTO;
 using Store.Core.Abstractions.Repository;
 using Store.Core.Exceptions;
 using Store.Core.Models;
 
-namespace Store.Application.Services
+namespace Store.Application.Services.Admin
 {
-    public class OrderItemService : IOrderItemService
+    public class AdminOrderItemService : IAdminOrderItemService
     {
         private readonly IOrderItemRepository _itemRepository;
 
-        public OrderItemService(IOrderItemRepository itemRepository)
+        public AdminOrderItemService(IOrderItemRepository itemRepository)
         {
             _itemRepository = itemRepository;
         }

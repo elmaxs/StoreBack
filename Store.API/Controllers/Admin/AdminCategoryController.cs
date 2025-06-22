@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Store.Application.Abstractions.Admin;
 using Store.Contracts.AdminContracts.Request.CategoryDTO;
 using Store.Contracts.AdminContracts.Response.CategoryDTO;
-using Store.Core.Abstractions.Services;
 
 namespace Store.API.Controllers.Admin
 {
@@ -9,9 +9,9 @@ namespace Store.API.Controllers.Admin
     [ApiController]
     public class AdminCategoryController : ControllerBase
     {
-        private readonly ICategoryService _categoryService;
+        private readonly IAdminCategoryService _categoryService;
 
-        public AdminCategoryController(ICategoryService categoryService)
+        public AdminCategoryController(IAdminCategoryService categoryService)
         {
             _categoryService = categoryService;
         }

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Store.Application.Abstractions;
+using Store.Application.Abstractions.Admin;
 using Store.Contracts.AdminContracts.Request.ProductDTO;
 using Store.Contracts.AdminContracts.Response.ProductDTO;
 using Store.Core.Exceptions;
@@ -14,9 +14,9 @@ namespace Store.API.Controllers.Admin
         // GET /products?categoryId=3&page=1&pageSize=20
         //[HttpGet]
         //public async Task<IActionResult> GetProducts([FromQuery] Guid categoryId, int page = 1, int pageSize = 20)
-        private readonly IProductService _productService;
+        private readonly IAdminProductService _productService;
 
-        public AdminProductController(IProductService productService)
+        public AdminProductController(IAdminProductService productService)
         {
             _productService = productService;
         }
@@ -51,20 +51,20 @@ namespace Store.API.Controllers.Admin
             }
         }
 
-        [HttpGet("products/by-category")]
-        public async Task<ActionResult<AdminReadProductDTO>> GetProductsByCategoryId([FromQuery] Guid categoryId)
-        {
-            try
-            {
-                var result = await _productService.GetProductsByCategoryId(categoryId);
+        //[HttpGet("products/by-category")]
+        //public async Task<ActionResult<AdminReadProductDTO>> GetProductsByCategoryId([FromQuery] Guid categoryId)
+        //{
+        //    try
+        //    {
+        //        var result = await _productService.GetProductsByCategoryId(categoryId);
 
-                return Ok(result);
-            }
-            catch(Exception ex)
-            {
-                return NotFound(new { Message = ex });
-            }
-        }
+        //        return Ok(result);
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        return NotFound(new { Message = ex });
+        //    }
+        //}
 
         [HttpPost("create")]
         public async Task<ActionResult<Guid>> CreateProduct([FromBody] AdminCreateProductDTO productDTO)

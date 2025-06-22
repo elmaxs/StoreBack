@@ -1,9 +1,9 @@
 ﻿using Store.Contracts.AdminContracts.Request.OrderItemDTO;
 using Store.Contracts.AdminContracts.Response.OrderItemDTO;
 
-namespace Store.Application.Abstractions
+namespace Store.Application.Abstractions.Admin
 {
-    public interface IOrderItemService
+    public interface IAdminOrderItemService
     {
         Task<Guid> CreateOrderItem(AdminCreateOrderItemDTO orderItemDTO);
         Task<IEnumerable<AdminReadOrderItemDTO>> GetAllOrderItem();
