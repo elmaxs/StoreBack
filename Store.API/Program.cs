@@ -4,6 +4,8 @@ using Store.Core.Abstractions.Repository;
 using Store.DataAccess.Repositories;
 using Store.Application.Abstractions.Admin;
 using Store.Application.Services.Admin;
+using Store.Application.Abstractions.User;
+using Store.Application.Services.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,14 +22,21 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<OnlineStoreDbContext>(
     options => options.UseNpgsql(connectionString + ";TrustServerCertificate=True"));
 
+//Repo
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<IAdminCategoryService, AdminCategoryService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IAdminOrderService, AdminOrderService>();
 builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
-builder.Services.AddScoped<IAdminOrderItemService, AdminOrderItemService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+//Admin services
+builder.Services.AddScoped<IAdminCategoryService, AdminCategoryService>();
+builder.Services.AddScoped<IAdminOrderService, AdminOrderService>();
+builder.Services.AddScoped<IAdminOrderItemService, AdminOrderItemService>();
 builder.Services.AddScoped<IAdminProductService, AdminProductService>();
+
+//User services
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddCors(options =>
 {
@@ -61,6 +70,6 @@ app.MapControllers();
 //    x.WithOrigins("http//local");//puth from front
 //    x.WithMethods().AllowAnyMethod();
 //});
-app.UseCors("AllowReactApp");
+app.UseCors("AllowAll");//ReactApp
 
 app.Run();

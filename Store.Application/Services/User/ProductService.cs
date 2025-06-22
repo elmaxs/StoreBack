@@ -1,4 +1,5 @@
 ﻿using Store.Application.Abstractions.User;
+using Store.Contracts.UserContracts.Request.ProductUserDTO;
 using Store.Contracts.UserContracts.Response.ProductUserDTO;
 using Store.Core.Abstractions.Repository;
 using Store.Core.Exceptions;
@@ -15,7 +16,7 @@ namespace Store.Application.Services.User
             _productRepository = productRepository;
         }
 
-        public async Task<IEnumerable<ReadProductDTO>>? GetProductsByCategoryId(Guid categoryId)
+        public async Task<IEnumerable<ReadProductByCategoryDTO>>? GetProductsByCategoryId(Guid categoryId)
         {
             if (categoryId == Guid.Empty)
                 throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
@@ -24,9 +25,20 @@ namespace Store.Application.Services.User
             if (products is null)
                 throw new NotFound(ErrorMessages.ProductNotFound);
 
-            var productsDTO = products.Select(p => new ReadProductDTO(p.Name, p.CategoryName, p.ImageUrl, p.Price));
+            var productsDTO = products.Select(p => new ReadProductByCategoryDTO(p.Name, p.CategoryName, p.ImageUrl, 
+                p.Price, products.Count()));
 
             return productsDTO;
+        }
+
+        public async Task<IEnumerable<ReadProductDTO>> GetFilteredProductsAsync(ProductFilterParams filter)
+        {
+            var products = await _productRepository.GetFilteredProductsAsync(filter.CategoryId, filter.Order, 
+                filter.Page, filter.PageSize);
+
+            var productDTO = products.Select(p => new ReadProductDTO(p.Name, p.CategoryName, p.ImageUrl, p.Price)).ToList();
+
+            return productDTO;
         }
     }
 }

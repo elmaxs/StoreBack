@@ -1,15 +1,11 @@
-﻿using Store.Contracts.UserContracts.Response.ProductUserDTO;
-using Store.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Store.Contracts.UserContracts.Request.ProductUserDTO;
+using Store.Contracts.UserContracts.Response.ProductUserDTO;
 
 namespace Store.Application.Abstractions.User
 {
     public interface IProductService
     {
-        Task<IEnumerable<ReadProductDTO>>? GetProductsByCategoryId(Guid categoryId);
+        Task<IEnumerable<ReadProductByCategoryDTO>>? GetProductsByCategoryId(Guid categoryId);
+        Task<IEnumerable<ReadProductDTO>> GetFilteredProductsAsync(ProductFilterParams filter);
     }
 }

@@ -91,5 +91,39 @@ namespace Store.DataAccess.Repositories
 
             return id;
         }
+
+        public async Task<List<Product>> GetFilteredProductsAsync(Guid? categoryId, string order, int page, int pageSize)
+        {
+            var query = _context.Products.Include(p => p.Category).AsQueryable();
+
+            if(categoryId != null)
+            {
+                query = query.Where(p => p.CategoryId == categoryId);
+            }
+
+            if(order.ToLower() == "desc")
+            {
+                query = query.OrderByDescending(p => p.Price);
+            }
+            else
+            {
+                query = query.OrderBy(p => p.Price);
+            }
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            var productsEntity = await query.ToListAsync();
+
+            return productsEntity.Select(p => Product.CreateProduct(p.Id, p.Name, p.Description, p.ImageUrl, p.Price,
+                p.CategoryId, p.Category.Name, p.StockQuantity).Product).ToList();
+
+            //return await MappingFiltered(await query.ToListAsync());
+        }
+
+        //private async Task<List<Product>> MappingFiltered(List<ProductEntity> productsEntity)
+        //{
+        //    return productsEntity.Select(p => Product.CreateProduct(p.Id, p.Name, p.Description, p.ImageUrl, p.Price, 
+        //        p.CategoryId, p.Category.Name, p.StockQuantity).Product).ToList();
+        //}
     }
 }
