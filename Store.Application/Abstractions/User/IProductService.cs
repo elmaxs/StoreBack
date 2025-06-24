@@ -5,7 +5,7 @@ namespace Store.Application.Abstractions.User
 {
     public interface IProductService
     {
-        Task<IEnumerable<ReadProductByCategoryDTO>>? GetProductsByCategoryId(Guid categoryId);
+        Task<IEnumerable<ReadProductByCategoryDTO>>? GetProductsByCategoryHierarchy(Guid categoryId);
         Task<IEnumerable<ReadProductDTO>> GetFilteredProductsAsync(ProductFilterParams filter);
     }
 }

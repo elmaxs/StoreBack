@@ -78,6 +78,15 @@ namespace Store.DataAccess.Repositories
             return products;
         }
 
+        public async Task<IEnumerable<Product>>? GetByCategoryIds(IEnumerable<Guid> categoryIds)
+        {
+            var productsEntity = await _context.Products.AsNoTracking().Where(p => categoryIds.Contains(p.CategoryId))
+                .Include(p => p.Category).ToListAsync();
+
+            return productsEntity.Select(p => Product.CreateProduct(p.Id, p.Name, p.Description, p.ImageUrl, p.Price,
+                p.CategoryId, p.Category.Name, p.StockQuantity).Product);
+        }
+
         public async Task<Guid> Update(Guid id, Product product)
         {
             await _context.Products.Where(p => p.Id == id).ExecuteUpdateAsync(s => s

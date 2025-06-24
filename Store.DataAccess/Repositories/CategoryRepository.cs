@@ -36,6 +36,18 @@ namespace Store.DataAccess.Repositories
             return id;
         }
 
+        public async Task<IEnumerable<Category>> GetMains()
+        {
+            var categoriesEntity = await _context.Categories.Where(c => c.ParentCategoryId == null).ToListAsync();
+            if (categoriesEntity is null)
+                return null;
+
+            var categories = categoriesEntity.Select(c => Category.CreateCategory(c.Id, c.Name, c.ParentCategoryId,
+                0, new List<Product>(), new List<Category>()).Category).ToList();
+
+            return categories;
+        }
+
         public async Task<IEnumerable<Category>>? GetAll()
         {
             var categoriesEntity = await _context.Categories

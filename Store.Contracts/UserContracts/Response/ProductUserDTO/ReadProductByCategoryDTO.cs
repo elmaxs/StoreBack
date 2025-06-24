@@ -7,10 +7,7 @@ using System.Threading.Tasks;
 namespace Store.Contracts.UserContracts.Response.ProductUserDTO
 {
     public record ReadProductByCategoryDTO(
-        string Name,
-        string CategoryName,
-        string ImageURL,
-        decimal Price,
-        int Count
+        Guid CategoryId,
+        List<ReadProductDTO>? Products
         );
 }

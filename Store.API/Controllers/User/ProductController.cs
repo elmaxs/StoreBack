@@ -23,13 +23,13 @@ namespace Store.API.Controllers.User
         {
             try
             {
-                var products = await _productService.GetProductsByCategoryId(categoryId);
+                var products = await _productService.GetProductsByCategoryHierarchy(categoryId);
 
                 return Ok(products);
             }
             catch(Exception ex)
             {
-                return NotFound(new { Message = ex });
+                return NotFound(new { message = ex.Message });
             }
         }
 
@@ -47,7 +47,7 @@ namespace Store.API.Controllers.User
             }
             catch(Exception ex)
             {
-                return NotFound(new { Message = ex });
+                return NotFound(new { message = ex.Message });
             }
         }
     }

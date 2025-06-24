@@ -59,6 +59,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowReactApp");
+//app.UseCors("AllowAll");//ReactApp
+
 app.UseAuthorization();
 
 app.MapControllers();
@@ -70,6 +73,6 @@ app.MapControllers();
 //    x.WithOrigins("http//local");//puth from front
 //    x.WithMethods().AllowAnyMethod();
 //});
-app.UseCors("AllowAll");//ReactApp
+//app.UseCors("AllowAll");//ReactApp
 
 app.Run();

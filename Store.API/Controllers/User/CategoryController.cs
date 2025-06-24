@@ -16,6 +16,21 @@ namespace Store.API.Controllers.User
             _categoryService = categoryService;
         }
 
+        [HttpGet("get-mains")]
+        public async Task<ActionResult<IEnumerable<ReadCategoriesDTO>>> GetMainsCategories()
+        {
+            try
+            {
+                var categories = await _categoryService.GetMainsCategories();
+
+                return Ok(categories);
+            }
+            catch(Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
         [HttpGet("breadcrumb-{id:guid}")]
         public async Task<ActionResult<List<BreadcrumbCategoryDTO>>> GetBreadcrumbCategories(Guid id)
         {
@@ -27,7 +42,7 @@ namespace Store.API.Controllers.User
             }
             catch(Exception ex)
             {
-                return NotFound(new { Message = ex });
+                return NotFound(new { message = ex.Message });
             }
         }
     }

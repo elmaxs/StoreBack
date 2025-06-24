@@ -29,7 +29,7 @@ namespace Store.API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                return NotFound(new { Message = ex });
+                return NotFound(new { message = ex.Message });
             }
         }
 
@@ -44,7 +44,7 @@ namespace Store.API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                return NotFound(new { Message = ex });
+                return NotFound(new { message = ex.Message });
             }
         }
 
@@ -62,7 +62,7 @@ namespace Store.API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = ex });
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -80,7 +80,7 @@ namespace Store.API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = ex });
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -95,7 +95,7 @@ namespace Store.API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = ex });
+                return BadRequest(new { message = ex.Message });
             }
         }
     }
