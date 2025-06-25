@@ -43,32 +43,32 @@ namespace Store.Application.Services.User
             return breadcrumbs;
         }
 
-        public async Task<IEnumerable<Guid>> GetAllNestedCategoryIds(Guid categoryId)
+        public async Task<IEnumerable<(Guid, string)>> GetAllNestedCategoryIdsAndNames(Guid categoryId)
         {
             if (categoryId == Guid.Empty)
                 throw new InvalidOperationException(ErrorMessages.GuidCannotBeEmpty);
 
-            List<Guid> hierarchy = new List<Guid>();
+            List<(Guid, string)> hierarchy = new List<(Guid, string)>();
 
-            await RecursiveHierarchy(categoryId, hierarchy);
+            await RecursiveHierarchy(categoryId, null, hierarchy);
             if (hierarchy.Count == 0)
                 throw new NotFound(ErrorMessages.CategoryNotFound);
 
             return hierarchy;
         }
 
-        private async Task RecursiveHierarchy(Guid categoryId, List<Guid> hierarchy)
+        private async Task RecursiveHierarchy(Guid categoryId, string? categoryName, List<(Guid, string)> hierarchy)
         {
             var category = await _categoryRepository.GetById(categoryId);
             if (category is null)
                 return;
 
-            hierarchy.Add(categoryId);
+            hierarchy.Add((categoryId, category.CategoryName));
 
             if (!category.Products.Any())
             {
                 foreach (var sub in category.Subcategories)
-                    await RecursiveHierarchy(sub.Id, hierarchy);
+                    await RecursiveHierarchy(sub.Id, sub.CategoryName, hierarchy);
             }
         }
 

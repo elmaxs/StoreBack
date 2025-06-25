@@ -24,15 +24,17 @@ namespace Store.Application.Services.User
             if (categoryId == Guid.Empty)
                 throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
 
-            var categoryIds = await _categoryService.GetAllNestedCategoryIds(categoryId);
+            var categoryIdsAndNames = await _categoryService.GetAllNestedCategoryIdsAndNames(categoryId);
+
+            var categoryIds = categoryIdsAndNames.Select(c => c.Item1);
 
             var products = await _productRepository.GetByCategoryIds(categoryIds);
             if (products is null || !products.Any())
                 throw new NotFound(ErrorMessages.ProductNotFound);
 
-            return categoryIds.Select(c => new ReadProductByCategoryDTO(c,
-                products.Where(p => p.CategoryId == c)
-                .Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, p.ImageUrl, p.Price)).ToList()));
+            return categoryIdsAndNames.Select(c => new ReadProductByCategoryDTO(c.Item1, c.Item2,
+                products.Where(p => p.CategoryId == c.Item1)
+                .Select(p => new ReadProductInByCategoryDTO(p.Id, p.Name, p.ImageUrl, p.Price)).ToList()));
         }
 
         public async Task<IEnumerable<ReadProductDTO>> GetFilteredProductsAsync(ProductFilterParams filter)
