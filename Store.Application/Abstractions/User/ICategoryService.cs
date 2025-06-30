@@ -1,6 +1,4 @@
 ﻿using Store.Contracts.UserContracts.Response.CategoryUserDTO;
-using Store.Core.Models;
-using System.Threading.Tasks;
 
 namespace Store.Application.Abstractions.User
 {
@@ -10,5 +8,6 @@ namespace Store.Application.Abstractions.User
         //Task<TreeCategoryDTO> BuildTreeCategory(Guid currentCategoryId); mb late
         Task<IEnumerable<ReadCategoriesDTO>> GetMainsCategories();
         Task<IEnumerable<(Guid, string)>> GetAllNestedCategoryIdsAndNames(Guid categoryId);
+        Task<IEnumerable<CategoriesForMainDTO>> GetCategoriesForMainPage();
     }
 }

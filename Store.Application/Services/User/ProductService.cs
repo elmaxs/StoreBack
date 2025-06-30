@@ -1,9 +1,11 @@
 ﻿using Store.Application.Abstractions.User;
 using Store.Contracts.UserContracts.Request.ProductUserDTO;
+using Store.Contracts.UserContracts.Response.CategoryUserDTO;
 using Store.Contracts.UserContracts.Response.ProductUserDTO;
 using Store.Core.Abstractions.Repository;
 using Store.Core.Exceptions;
 using Store.Core.Models;
+using System.Linq;
 using ValidationException = Store.Core.Exceptions.ValidationException;
 
 namespace Store.Application.Services.User
@@ -46,5 +48,46 @@ namespace Store.Application.Services.User
 
             return productDTO;
         }
+
+        public async Task<IEnumerable<ReadProductMainPage>> GetProductsForMainPage()
+        {
+            var categories = await _categoryService.GetCategoriesForMainPage();
+            if (!categories.Any())
+                throw new NotFound(ErrorMessages.CategoryNotFound);
+
+            var result = new List<ReadProductMainPage>();
+
+            foreach (var category in categories)
+            {
+                var products = await MappingForGetProductsForMainPage(category);
+                result.Add(new ReadProductMainPage(category, products.ToList()));
+            }
+
+            return result;
+        }
+
+
+        private async Task<IEnumerable<ReadProductInByCategoryDTO>> MappingForGetProductsForMainPage(CategoriesForMainDTO category)
+        {
+            var products = await _productRepository.GetByCategoryId(category.CategoryId);
+
+            if (category.Subcategories.Any())
+            {
+                for (int count = 0; count < category.Subcategories.Count; count++)
+                {
+                    var sub = category.Subcategories[count];
+
+                    category.Subcategories[count] = new CategoriesForMainDTO(
+                        sub.CategoryId,
+                        sub.CategoryName,
+                        sub.Subcategories,
+                        (await MappingForGetProductsForMainPage(sub))?.ToList()
+                    );
+                }
+            }
+
+            return products.Take(5).Select(p => new ReadProductInByCategoryDTO(p.Id, p.Name, p.ImageUrl, p.Price)).ToList();
+        }
+
     }
 }

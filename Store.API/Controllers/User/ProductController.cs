@@ -41,9 +41,16 @@ namespace Store.API.Controllers.User
 
             try
             {
-                var product = await _productService.GetFilteredProductsAsync(filters);
-
-                return Ok(product);
+                if (filters.CategoryId is null || filters.CategoryId == Guid.Empty)
+                { 
+                    var products = await _productService.GetProductsForMainPage();
+                    return Ok(products);
+                }
+                else
+                {
+                    var products = await _productService.GetFilteredProductsAsync(filters);
+                    return Ok(products);
+                }
             }
             catch(Exception ex)
             {

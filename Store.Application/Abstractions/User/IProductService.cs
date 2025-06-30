@@ -7,5 +7,6 @@ namespace Store.Application.Abstractions.User
     {
         Task<IEnumerable<ReadProductByCategoryDTO>>? GetProductsByCategoryHierarchy(Guid categoryId);
         Task<IEnumerable<ReadProductDTO>> GetFilteredProductsAsync(ProductFilterParams filter);
+        Task<IEnumerable<ReadProductMainPage>> GetProductsForMainPage();
     }
 }
