@@ -33,7 +33,24 @@ namespace Store.API.Controllers.User
             }
         }
 
-        [HttpGet("products")]
+        [HttpGet("products/main")]
+        public async Task<ActionResult<List<ReadProductMainPage>>> GetProductsForMainPage([FromQuery] ProductFilterParams filters)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Bad data");
+
+            try
+            {
+                var products = await _productService.GetProductsForMainPage();
+                return Ok(products);
+            }
+            catch(Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("products/filtered")]
         public async Task<ActionResult<List<ReadProductDTO>>> GetFiltered([FromQuery] ProductFilterParams filters)
         {
             if (!ModelState.IsValid)
@@ -41,21 +58,14 @@ namespace Store.API.Controllers.User
 
             try
             {
-                if (filters.CategoryId is null || filters.CategoryId == Guid.Empty)
-                { 
-                    var products = await _productService.GetProductsForMainPage();
-                    return Ok(products);
-                }
-                else
-                {
-                    var products = await _productService.GetFilteredProductsAsync(filters);
-                    return Ok(products);
-                }
+                var products = await _productService.GetFilteredProductsAsync(filters);
+                return Ok(products);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return NotFound(new { message = ex.Message });
             }
         }
     }
 }
+

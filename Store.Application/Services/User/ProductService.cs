@@ -4,8 +4,6 @@ using Store.Contracts.UserContracts.Response.CategoryUserDTO;
 using Store.Contracts.UserContracts.Response.ProductUserDTO;
 using Store.Core.Abstractions.Repository;
 using Store.Core.Exceptions;
-using Store.Core.Models;
-using System.Linq;
 using ValidationException = Store.Core.Exceptions.ValidationException;
 
 namespace Store.Application.Services.User
@@ -49,6 +47,40 @@ namespace Store.Application.Services.User
             return productDTO;
         }
 
+        //public async Task<IEnumerable<ReadProductMainPage>> GetProductsForMainPage()
+        //{
+        //    var categories = await _categoryService.GetCategoriesForMainPage();
+        //    if (!categories.Any())
+        //        throw new NotFound(ErrorMessages.CategoryNotFound);
+
+        //    var result = new List<ReadProductMainPage>();
+
+        //    foreach (var topCategory in categories)
+        //    {
+        //        var enrichedTop = await MappingForGetProductsForMainPage(topCategory);
+        //        result.Add(new ReadProductMainPage(enrichedTop));
+        //    }
+
+        //    return result;
+
+        //    #region my
+        //    //var categories = await _categoryService.GetCategoriesForMainPage();
+        //    //if (!categories.Any())
+        //    //    throw new NotFound(ErrorMessages.CategoryNotFound);
+
+        //    //var result = new List<ReadProductMainPage>();
+
+        //    //foreach (var category in categories)
+        //    //{
+        //    //    var products = await MappingForGetProductsForMainPage(category);
+        //    //    result.Add(new ReadProductMainPage(category, products.ToList()));
+        //    //}
+
+        //    //return result;
+        //    #endregion
+        //}
+
+
         public async Task<IEnumerable<ReadProductMainPage>> GetProductsForMainPage()
         {
             var categories = await _categoryService.GetCategoriesForMainPage();
@@ -57,37 +89,38 @@ namespace Store.Application.Services.User
 
             var result = new List<ReadProductMainPage>();
 
-            foreach (var category in categories)
+            foreach (var topCategory in categories)
             {
-                var products = await MappingForGetProductsForMainPage(category);
-                result.Add(new ReadProductMainPage(category, products.ToList()));
+                var enrichedTop = await EnrichWithProducts(topCategory);
+                result.Add(new ReadProductMainPage(enrichedTop));
             }
 
             return result;
         }
 
-
-        private async Task<IEnumerable<ReadProductInByCategoryDTO>> MappingForGetProductsForMainPage(CategoriesForMainDTO category)
+        private async Task<CategoriesForMainDTO> EnrichWithProducts(CategoriesForMainDTO category)
         {
-            var products = await _productRepository.GetByCategoryId(category.CategoryId);
-
-            if (category.Subcategories.Any())
+            if (category.Subcategories is null || !category.Subcategories.Any())
             {
-                for (int count = 0; count < category.Subcategories.Count; count++)
-                {
-                    var sub = category.Subcategories[count];
+                // финальная категория — получаем продукты
+                var products = await _productRepository.GetByCategoryId(category.CategoryId);
+                var productDtos = products?
+                    .Where(p => p != null)
+                    .Take(5)
+                    .Select(p => new ReadProductInByCategoryDTO(p.Id, p.Name, p.ImageUrl, p.Price))
+                    .ToList();
 
-                    category.Subcategories[count] = new CategoriesForMainDTO(
-                        sub.CategoryId,
-                        sub.CategoryName,
-                        sub.Subcategories,
-                        (await MappingForGetProductsForMainPage(sub))?.ToList()
-                    );
-                }
+                return category with { Products = productDtos };
             }
-
-            return products.Take(5).Select(p => new ReadProductInByCategoryDTO(p.Id, p.Name, p.ImageUrl, p.Price)).ToList();
+            else
+            {
+                // обходим только первую подкатегорию
+                var sub = await EnrichWithProducts(category.Subcategories.First());
+                return category with { Subcategories = new List<CategoriesForMainDTO> { sub } };
+            }
         }
 
     }
+
 }
+
