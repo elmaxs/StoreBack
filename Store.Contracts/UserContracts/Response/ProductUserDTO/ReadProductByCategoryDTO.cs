@@ -3,10 +3,10 @@
     public record ReadProductByCategoryDTO(
         Guid CategoryId,
         string? CategoryName,
-        List<ReadProductInByCategoryDTO>? Products
+        List<ReadProductForCategoryDTO>? Products
         );
 
-    public record ReadProductInByCategoryDTO(
+    public record ReadProductForCategoryDTO(
         Guid? ProductId,
         string? ProductName,
         string? ImageURL,

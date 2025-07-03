@@ -7,6 +7,6 @@ namespace Store.Contracts.UserContracts.Response.CategoryUserDTO
         Guid CategoryId,
         string CategoryName,
         List<CategoriesForMainDTO>? Subcategories,
-        List<ReadProductInByCategoryDTO>? Products // ✅ сюда попадут только к последним подкатегориям
+        List<ReadProductForCategoryDTO>? Products // ✅ сюда попадут только к последним подкатегориям
     );
 }
