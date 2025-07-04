@@ -17,7 +17,7 @@ namespace Store.API.Controllers.User
         }
 
         [HttpGet("get-mains")]
-        public async Task<ActionResult<IEnumerable<ReadCategoriesDTO>>> GetMainsCategories()
+        public async Task<ActionResult<IEnumerable<ReadMainCategories>>> GetMainsCategories()
         {
             try
             {

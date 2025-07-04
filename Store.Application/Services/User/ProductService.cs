@@ -1,6 +1,5 @@
 ﻿using Store.Application.Abstractions.User;
 using Store.Contracts.UserContracts.Request.ProductUserDTO;
-using Store.Contracts.UserContracts.Response.CategoryUserDTO;
 using Store.Contracts.UserContracts.Response.ProductUserDTO;
 using Store.Core.Abstractions.Repository;
 using Store.Core.Exceptions;
@@ -20,13 +19,54 @@ namespace Store.Application.Services.User
         }
 
         /// <summary>
+        /// Basic method for get products
+        /// </summary>
+        /// <param name="categoryId">Search products by cateogry</param>
+        /// <param name="includeSubcategories">If true, include subcategories products</param>
+        /// <returns>List ReadProductDTO</returns>
+        /// <exception cref="ValidationException">If category not has products</exception>
+        /// <exception cref="NotFound">If products not found</exception>
+        public async Task<IEnumerable<ReadProductDTO>> GetProducts(Guid categoryId, bool includeSubcategories)
+        {
+            if (categoryId == Guid.Empty || categoryId == new Guid())
+                throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
+
+            if(includeSubcategories)
+            {
+                var result = await GetProductsByCategoryHierarchy(categoryId);
+
+                if (result is null || !result.Any())
+                    throw new NotFound(ErrorMessages.ProductNotFound);
+
+                return result;
+            }
+            else
+            {
+                var isProductsInCategory = await _categoryService.CategoryHasProducts(categoryId);
+
+                if (!isProductsInCategory)
+                    throw new ValidationException(ErrorMessages.CategoryNotHasProducts);
+
+                else
+                {
+                    var products = await _productRepository.GetByCategoryId(categoryId);
+                    if (products is null || !products.Any())
+                        throw new NotFound(ErrorMessages.ProductNotFound);
+
+                    return products.Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, p.CategoryId, 
+                        p.ImageUrl, p.Price)).ToList();
+                }
+            }
+        }
+
+        /// <summary>
         /// Get products by category id.
         /// </summary>
         /// <param name="categoryId">Search by category id</param>
         /// <returns>If category is main parent, will returned all subcategories and his products</returns>
         /// <exception cref="ValidationException">Guid cant be empty</exception>
         /// <exception cref="NotFound">Products not found</exception>
-        public async Task<IEnumerable<ReadProductByCategoryDTO>>? GetProductsByCategoryHierarchy(Guid categoryId)
+        private async Task<IEnumerable<ReadProductDTO>>? GetProductsByCategoryHierarchy(Guid categoryId)
         {
             if (categoryId == Guid.Empty)
                 throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
@@ -39,9 +79,8 @@ namespace Store.Application.Services.User
             if (products is null || !products.Any())
                 throw new NotFound(ErrorMessages.ProductNotFound);
 
-            return categoryIdsAndNames.Select(c => new ReadProductByCategoryDTO(c.Item1, c.Item2,
-                products.Where(p => p.CategoryId == c.Item1)
-                .Select(p => new ReadProductForCategoryDTO(p.Id, p.Name, p.ImageUrl, p.Price)).ToList()));
+            return products.Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, p.CategoryId, p.ImageUrl, p.Price))
+                .ToList();
         }
 
         /// <summary>
@@ -54,12 +93,14 @@ namespace Store.Application.Services.User
             var products = await _productRepository.GetFilteredProductsAsync(filter.CategoryId, filter.Order, 
                 filter.Page, filter.PageSize);
 
-            var productDTO = products.Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, p.ImageUrl, p.Price)).ToList();
+            var productDTO = products.Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, filter.CategoryId,
+                p.ImageUrl, p.Price)).ToList();
 
             return productDTO;
         }
 
-        public async Task<IEnumerable<IEnumerable<ReadProductByCategoryDTO>>> GetProductsForMainPage()
+        //переделать
+        public async Task<IEnumerable<IEnumerable<ReadProductDTO>>> GetProductsForMainPage()
         {
             var popularCategoryId = new Guid[]
             {
@@ -72,70 +113,17 @@ namespace Store.Application.Services.User
                 Guid.Parse("998ac30f-8553-493d-906c-b2351fdba1da")
             };
 
-            var result = new List<List<ReadProductByCategoryDTO>>();
+            var result = new List<List<ReadProductDTO>>();
             foreach(var categoryId in popularCategoryId)
             {
                 var products = await GetProductsByCategoryHierarchy(categoryId);
-                if(products is not null)
-                    result.Add(products.ToList());
+                if (products is not null)
+                    return null;
+                    //result.Add(products.ToList());
             }
 
             return result;
         }
-
-        //мб потом это переделать и юзать
-        #region Get for main
-        ///// <summary>
-        ///// Get products for main page.
-        ///// </summary>
-        ///// <returns>Products for main page by popular category.</returns>
-        ///// <exception cref="NotFound">Category not found</exception>
-        //public async Task<IEnumerable<ReadProductMainPage>> GetProductsForMainPage()
-        //{
-        //    var categories = await _categoryService.GetCategoriesForMainPage();
-        //    if (!categories.Any())
-        //        throw new NotFound(ErrorMessages.CategoryNotFound);
-
-        //    var result = new List<ReadProductMainPage>();
-
-        //    foreach (var topCategory in categories)
-        //    {
-        //        var enrichedTop = await EnrichWithProducts(topCategory);
-        //        result.Add(new ReadProductMainPage(enrichedTop));
-        //    }
-
-        //    return result;
-        //}
-
-
-        ////мб потом переделать и юзать этот метод
-        ///// <summary>
-        ///// Mapping for GetProductsForMainPage
-        ///// </summary>
-        ///// <param name="category">Current category</param>
-        ///// <returns></returns>
-        //private async Task<CategoriesForMainDTO> EnrichWithProducts(CategoriesForMainDTO category)
-        //{
-        //    if (category.Subcategories is null || !category.Subcategories.Any())
-        //    {
-        //        // финальная категория — получаем продукты
-        //        var products = await _productRepository.GetByCategoryId(category.CategoryId);
-        //        var productDtos = products?
-        //            .Where(p => p != null)
-        //            .Take(5)
-        //            .Select(p => new ReadProductForCategoryDTO(p.Id, p.Name, p.ImageUrl, p.Price))
-        //            .ToList();
-
-        //        return category with { Products = productDtos };
-        //    }
-        //    else
-        //    {
-        //        // обходим только первую подкатегорию
-        //        var sub = await EnrichWithProducts(category.Subcategories.First());
-        //        return category with { Subcategories = new List<CategoriesForMainDTO> { sub } };
-        //    }
-        //}
-        #endregion
     }
 
 }

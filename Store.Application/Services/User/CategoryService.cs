@@ -3,6 +3,8 @@ using Store.Contracts.UserContracts.Response.CategoryUserDTO;
 using Store.Contracts.UserContracts.Response.ProductUserDTO;
 using Store.Core.Abstractions.Repository;
 using Store.Core.Exceptions;
+using Store.Core.Models;
+using System.Linq;
 
 namespace Store.Application.Services.User
 {
@@ -17,15 +19,61 @@ namespace Store.Application.Services.User
             _productRepository = productRepository;
         }
 
-        public async Task<IEnumerable<ReadCategoriesDTO>> GetMainsCategories()
+        public async Task<bool> CategoryHasProducts(Guid categoryId)
+        {
+            var countProducts = await _categoryRepository.GetCountProductInCategory(categoryId);
+
+            if (countProducts < 1)
+                return false;
+
+            else
+                return true;
+        }
+
+        private async Task<IEnumerable<ReadMainCategories>> MapSubcategories(IEnumerable<Category> subcategories)
+        {
+            var subcategoryDTOs = await Task.WhenAll(
+                subcategories.Select(async sub =>
+                {
+                    var nestedSubcategories = sub.Subcategories != null && sub.Subcategories.Any()
+                        ? await MapSubcategories(sub.Subcategories)
+                        : null;
+
+                    return new ReadMainCategories(
+                        sub.Id,
+                        sub.CategoryName,
+                        sub.Products.Any(),
+                        sub.Subcategories != null && sub.Subcategories.Any()
+                    );
+                })
+            );
+
+            return subcategoryDTOs;
+        }
+
+        public async Task<IEnumerable<ReadMainCategories>> GetMainsCategories()
         {
             var categories = await _categoryRepository.GetMains();
-            if (categories is null)
+            if (categories == null || !categories.Any())
                 throw new ValidationException(ErrorMessages.CategoryNotFound);
 
-            var categoryDTO = categories.Select(c => new ReadCategoriesDTO(c.Id, c.CategoryName)).ToList();
+            var categoryDTOs = await Task.WhenAll(
+                categories.Select(async c =>
+                {
+                    var subcategories = c.Subcategories != null && c.Subcategories.Any()
+                        ? await MapSubcategories(c.Subcategories)
+                        : null;
 
-            return categoryDTO;
+                    return new ReadMainCategories(
+                        c.Id,
+                        c.CategoryName,
+                        c.Products.Any(),
+                        c.Subcategories != null && c.Subcategories.Any()
+                    );
+                })
+            );
+
+            return categoryDTOs;
         }
 
         public async Task<IEnumerable<BreadcrumbCategoryDTO>> BuildBreadcrumbAsync(Guid currentCategoryId)
@@ -93,9 +141,7 @@ namespace Store.Application.Services.User
 
             return new CategoriesForMainDTO(
                 category.Id,
-                category.CategoryName,
-                subcategories,
-                null // ❌ не загружаем продукты здесь
+                category.CategoryName
             );
         }
 

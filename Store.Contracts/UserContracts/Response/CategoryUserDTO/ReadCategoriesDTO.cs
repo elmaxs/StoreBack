@@ -2,6 +2,9 @@
 {
     public record ReadCategoriesDTO(
         Guid Id,
-        string Name
+        string Name,
+        bool HasProducts,
+        bool HasSubcategories,
+        IEnumerable<ReadCategoriesDTO>? Subcategories
         );
 }

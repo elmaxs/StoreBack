@@ -18,12 +18,12 @@ namespace Store.API.Controllers.User
         }
 
         [HttpGet("products-byCategory")]
-        public async Task<ActionResult<List<ReadProductByCategoryDTO>>> GetProductsByCategory([FromQuery] Guid categoryId,
-            int page = 1, int pageSize = 4)
+        public async Task<ActionResult<List<ReadProductDTO>>> GetProductsByCategory([FromQuery] Guid categoryId,
+            bool includeSubcategories, int page = 1, int pageSize = 4)
         {
             try
             {
-                var products = await _productService.GetProductsByCategoryHierarchy(categoryId);
+                var products = await _productService.GetProducts(categoryId, includeSubcategories);
 
                 return Ok(products);
             }
@@ -34,7 +34,7 @@ namespace Store.API.Controllers.User
         }
 
         [HttpGet("products/main")]
-        public async Task<ActionResult<List<ReadProductMainPage>>> GetProductsForMainPage([FromQuery] ProductFilterParams filters)
+        public async Task<ActionResult<List<ReadProductDTO>>> GetProductsForMainPage([FromQuery] ProductFilterParams filters)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Bad data");

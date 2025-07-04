@@ -10,5 +10,6 @@
         public const string UserNotFound = "User not found";
         public const string BadDataDTO = "DTO cant be null";
         public const string ModelCantBeCreate = "Model cant be create";
+        public const string CategoryNotHasProducts = "There are no products in the category";
     }
 }

@@ -4,6 +4,7 @@
         Guid? Id,
         string? Name,
         string? CategoryName,
+        Guid? CategoryId,
         string? ImageURL,
         decimal? Price);
 }
