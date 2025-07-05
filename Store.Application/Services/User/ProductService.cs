@@ -53,8 +53,8 @@ namespace Store.Application.Services.User
                     if (products is null || !products.Any())
                         throw new NotFound(ErrorMessages.ProductNotFound);
 
-                    return products.Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, p.CategoryId, 
-                        p.ImageUrl, p.Price)).ToList();
+                    return products.Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, p.CategoryId, p.ImageUrl,
+                        p.Description, p.Price)).ToList();
                 }
             }
         }
@@ -79,8 +79,8 @@ namespace Store.Application.Services.User
             if (products is null || !products.Any())
                 throw new NotFound(ErrorMessages.ProductNotFound);
 
-            return products.Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, p.CategoryId, p.ImageUrl, p.Price))
-                .ToList();
+            return products.Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, p.CategoryId, p.ImageUrl,
+                        p.Description, p.Price)).ToList();
         }
 
         /// <summary>
@@ -93,14 +93,14 @@ namespace Store.Application.Services.User
             var products = await _productRepository.GetFilteredProductsAsync(filter.CategoryId, filter.Order, 
                 filter.Page, filter.PageSize);
 
-            var productDTO = products.Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, filter.CategoryId,
-                p.ImageUrl, p.Price)).ToList();
+            var productDTO = products.Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, p.CategoryId, p.ImageUrl,
+                        p.Description, p.Price)).ToList();
 
             return productDTO;
         }
 
         //переделать
-        public async Task<IEnumerable<IEnumerable<ReadProductDTO>>> GetProductsForMainPage()
+        public async Task<IEnumerable<ReadProductBlockDTO>> GetProductsForMainPage()
         {
             var popularCategoryId = new Guid[]
             {
@@ -113,13 +113,25 @@ namespace Store.Application.Services.User
                 Guid.Parse("998ac30f-8553-493d-906c-b2351fdba1da")
             };
 
-            var result = new List<List<ReadProductDTO>>();
+            var result = new List<ReadProductBlockDTO>();
+            var readProductDTO = new List<ReadProductDTO>();
             foreach(var categoryId in popularCategoryId)
             {
-                var products = await GetProductsByCategoryHierarchy(categoryId);
-                if (products is not null)
-                    return null;
-                    //result.Add(products.ToList());
+                //if берем мейн категории(переделать надо)
+                //var products = await GetProductsByCategoryHierarchy(categoryId);
+                var products = await _productRepository.GetByCategoryId(categoryId);
+                if (products is null || !products.Any())
+                    throw new NotFound(ErrorMessages.ProductNotFound);
+                //result.Add(products.ToList());
+
+                (string categoryName, Guid categoryId) currentCategory = (products.First().CategoryName, 
+                    products.First().CategoryId);
+
+                readProductDTO = products.Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, p.CategoryId, p.ImageUrl,
+                        p.Description, p.Price)).ToList();
+
+                result.Add(new ReadProductBlockDTO(currentCategory.categoryId, currentCategory.categoryName,
+                    readProductDTO));
             }
 
             return result;

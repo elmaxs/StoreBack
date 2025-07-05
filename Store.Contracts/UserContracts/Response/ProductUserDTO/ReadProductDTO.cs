@@ -6,5 +6,6 @@
         string? CategoryName,
         Guid? CategoryId,
         string? ImageURL,
+        string? Description,
         decimal? Price);
 }

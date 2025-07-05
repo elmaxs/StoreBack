@@ -8,6 +8,6 @@ namespace Store.Application.Abstractions.User
         Task<IEnumerable<ReadProductDTO>> GetProducts(Guid categoryId, bool includeSubcategories);
         //Task<IEnumerable<ReadProductDTO>>? GetProductsByCategoryHierarchy(Guid categoryId);
         Task<IEnumerable<ReadProductDTO>> GetFilteredProductsAsync(ProductFilterParams filter);
-        Task<IEnumerable<IEnumerable<ReadProductDTO>>> GetProductsForMainPage();//Task<IEnumerable<ReadProductMainPage>>
+        Task<IEnumerable<ReadProductBlockDTO>> GetProductsForMainPage();//Task<IEnumerable<ReadProductMainPage>>
     }
 }

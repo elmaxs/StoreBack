@@ -34,7 +34,7 @@ namespace Store.API.Controllers.User
         }
 
         [HttpGet("products/main")]
-        public async Task<ActionResult<List<ReadProductDTO>>> GetProductsForMainPage([FromQuery] ProductFilterParams filters)
+        public async Task<ActionResult<List<ReadProductBlockDTO>>> GetProductsForMainPage([FromQuery] ProductFilterParams filters)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Bad data");
