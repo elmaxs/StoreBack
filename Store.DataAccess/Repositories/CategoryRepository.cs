@@ -78,7 +78,7 @@ namespace Store.DataAccess.Repositories
             var products = entity.Products.Select(p =>
                 Product.CreateProduct(
                     p.Id, p.Name, p.Description, p.ImageUrl, p.Price,
-                    p.CategoryId, entity.Name, p.StockQuantity
+                    p.CategoryId, entity.Name, p.BrandId, p.Brand.Name, p.StockQuantity
                 ).Product).ToList();
 
             // Підкатегорії поточної категорії (рекурсивно)

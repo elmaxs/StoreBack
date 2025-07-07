@@ -7,6 +7,9 @@
         public Guid CategoryId { get; set; }
         public CategoryEntity Category { get; set; } = null!;
 
+        public Guid? BrandId { get; set; }
+        public BrandEntity? Brand { get; set; } = null;
+
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
         public string ImageUrl { get; set; } = null!;

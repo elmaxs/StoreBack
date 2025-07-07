@@ -6,6 +6,7 @@
         public const string CategoryNotFound = "Category not found";
         public const string ProductNotFound = "Product not found";
         public const string OrderNotFound = "Order not found";
+        public const string BrandNotFound = "Brand not found";
         public const string OrderItemNotFound = "Order item not found";
         public const string UserNotFound = "User not found";
         public const string BadDataDTO = "DTO cant be null";

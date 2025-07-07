@@ -9,6 +9,7 @@ namespace Store.DataAccess
         public OnlineStoreDbContext(DbContextOptions<OnlineStoreDbContext> options) : base(options) { }
 
         public DbSet<UserEntity> Users { get; set; }
+        public DbSet<BrandEntity> Brands { get; set; }
         public DbSet<OrderEntity> Orders { get; set; }
         public DbSet<OrderItemEntity> OrderItems { get; set; }
         public DbSet<ProductEntity> Products { get; set; }
@@ -21,6 +22,7 @@ namespace Store.DataAccess
             modelBuilder.ApplyConfiguration(new OrderItemConfiguration());
             modelBuilder.ApplyConfiguration(new ProductConfiguration());
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
+            modelBuilder.ApplyConfiguration(new BrandConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

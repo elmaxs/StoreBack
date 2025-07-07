@@ -20,6 +20,7 @@ namespace Store.DataAccess.Repositories
             {
                 Id = product.Id,
                 CategoryId = product.CategoryId,
+                BrandId = product.BrandId,
                 Name = product.Name,
                 Description = product.Description,
                 ImageUrl = product.ImageUrl,
@@ -43,24 +44,27 @@ namespace Store.DataAccess.Repositories
 
         public async Task<IEnumerable<Product>>? GetAll()
         {
-            var productsEntity = await _context.Products.Include(p => p.Category).ToListAsync();
+            var productsEntity = await _context.Products.Include(p => p.Category).Include(p => p.Brand).ToListAsync();
             if (productsEntity is null)
                 return null;
 
-            var products = productsEntity.Select(p => Product.CreateProduct(p.Id, p.Name, p.Description, p.ImageUrl, p.Price,
-                p.CategoryId, p.Category.Name, p.StockQuantity).Product).ToList();
+            var products = productsEntity.Select(p => Product.CreateProduct(p.Id, p.Name, p.Description, p.ImageUrl, 
+                p.Price, p.CategoryId, p.Category.Name, p.BrandId, p.Brand.Name, p.StockQuantity).Product).ToList();
 
             return products;
         }
 
         public async Task<Product>? GetById(Guid id)
         {
-            var productEntity = await _context.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
+            var productEntity = await _context.Products.Include(p => p.Category).Include(p => p.Brand)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
             if (productEntity is null)
                 return null;
 
-            var product = Product.CreateProduct(productEntity.Id, productEntity.Name, productEntity.Description, productEntity.ImageUrl,
-                productEntity.Price, productEntity.CategoryId, productEntity.Category.Name, productEntity.StockQuantity).Product;
+            var product = Product.CreateProduct(productEntity.Id, productEntity.Name,
+                productEntity.Description, productEntity.ImageUrl, productEntity.Price, productEntity.CategoryId, 
+                productEntity.Category.Name, productEntity.BrandId, productEntity.Brand.Name, productEntity.StockQuantity).Product;
 
             return product;
         }
@@ -68,12 +72,12 @@ namespace Store.DataAccess.Repositories
         public async Task<IEnumerable<Product>>? GetByCategoryId(Guid categoryId)
         {
             var productsEntity = await _context.Products.Where(p => p.CategoryId == categoryId)
-                .Include(p => p.Category).ToListAsync();
+                .Include(p => p.Category).Include(p => p.Brand).ToListAsync();
             if (productsEntity is null)
                 return null;
 
-            var products = productsEntity.Select(p => Product.CreateProduct(p.Id, p.Name, p.Description, p.ImageUrl, p.Price,
-                p.CategoryId, p.Category.Name, p.StockQuantity).Product);
+            var products = productsEntity.Select(p => Product.CreateProduct(p.Id, p.Name, p.Description, p.ImageUrl, 
+                p.Price, p.CategoryId, p.Category.Name, p.BrandId, p.Brand.Name, p.StockQuantity).Product);
 
             return products;
         }
@@ -81,10 +85,10 @@ namespace Store.DataAccess.Repositories
         public async Task<IEnumerable<Product>>? GetByCategoryIds(IEnumerable<Guid> categoryIds)
         {
             var productsEntity = await _context.Products.AsNoTracking().Where(p => categoryIds.Contains(p.CategoryId))
-                .Include(p => p.Category).ToListAsync();
+                .Include(p => p.Category).Include(p => p.Brand).ToListAsync();
 
             return productsEntity.Select(p => Product.CreateProduct(p.Id, p.Name, p.Description, p.ImageUrl, p.Price,
-                p.CategoryId, p.Category.Name, p.StockQuantity).Product);
+                p.CategoryId, p.Category.Name, p.BrandId, p.Brand.Name, p.StockQuantity).Product);
         }
 
         public async Task<Guid> Update(Guid id, Product product)
@@ -95,6 +99,7 @@ namespace Store.DataAccess.Repositories
                 .SetProperty(p => p.ImageUrl, p => product.ImageUrl)
                 .SetProperty(p => p.Price, p => product.Price)
                 .SetProperty(p => p.CategoryId, p => product.CategoryId)
+                .SetProperty(p => p.BrandId, p => product.BrandId)
                 .SetProperty(p => p.StockQuantity, p => product.StockQuantity)
                 .SetProperty(p => p.IsAvailable, p => product.IsAvailable));
 
@@ -103,7 +108,7 @@ namespace Store.DataAccess.Repositories
 
         public async Task<List<Product>> GetFilteredProductsAsync(Guid? categoryId, string order, int page, int pageSize)
         {
-            var query = _context.Products.Include(p => p.Category).AsQueryable();
+            var query = _context.Products.Include(p => p.Category).Include(p => p.Brand).AsQueryable();
 
             if(categoryId != null)
             {
@@ -124,7 +129,7 @@ namespace Store.DataAccess.Repositories
             var productsEntity = await query.ToListAsync();
 
             return productsEntity.Select(p => Product.CreateProduct(p.Id, p.Name, p.Description, p.ImageUrl, p.Price,
-                p.CategoryId, p.Category.Name, p.StockQuantity).Product).ToList();
+                p.CategoryId, p.Category.Name, p.BrandId, p.Brand.Name, p.StockQuantity).Product).ToList();
 
             //return await MappingFiltered(await query.ToListAsync());
         }

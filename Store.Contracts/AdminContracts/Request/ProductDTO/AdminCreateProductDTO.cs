@@ -6,6 +6,7 @@
         string Description,
         string ImageUrl,
         decimal Price,
+        Guid BrandId,
         int StockQuantity
         );
 }

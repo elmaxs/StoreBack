@@ -3,6 +3,7 @@
     public record AdminReadProductDTO(
         Guid Id,
         Guid CategoryId,
+        Guid? BrandId,
         string Name,
         string Description,
         string ImageUrl,

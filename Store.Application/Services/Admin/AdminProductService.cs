@@ -11,11 +11,14 @@ namespace Store.Application.Services.Admin
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IBrandRepository _brandRepository;
 
-        public AdminProductService(IProductRepository productRepository, ICategoryRepository categoryRepository)
+        public AdminProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, 
+            IBrandRepository brandRepository)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
+            _brandRepository = brandRepository;
         }
 
         public async Task<Guid> CreateProduct(AdminCreateProductDTO productDTO)
@@ -26,11 +29,14 @@ namespace Store.Application.Services.Admin
             var id = Guid.NewGuid();
 
             var category = await _categoryRepository.GetById(productDTO.CategoryId);
+            var brand = await _brandRepository.GetById(productDTO.BrandId);
             if (category is null)
                 throw new NotFound(ErrorMessages.CategoryNotFound);
+            if (brand is null)
+                throw new NotFound(ErrorMessages.BrandNotFound);
 
             var (product, error) = Product.CreateProduct(id, productDTO.Name, productDTO.Description, productDTO.ImageUrl, productDTO.Price,
-                productDTO.CategoryId, category.CategoryName, productDTO.StockQuantity);
+                productDTO.CategoryId, category.CategoryName, brand.Id, brand.Name, productDTO.StockQuantity);
             if (!string.IsNullOrEmpty(error))
                 throw new ErrorDuringCreation(error);
 
@@ -55,6 +61,7 @@ namespace Store.Application.Services.Admin
             (
                 p.Id,
                 p.CategoryId,
+                p.BrandId,
                 p.Name,
                 p.Description,
                 p.ImageUrl,

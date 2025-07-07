@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Store.DataAccess;
@@ -11,9 +12,11 @@ using Store.DataAccess;
 namespace Store.DataAccess.Migrations
 {
     [DbContext(typeof(OnlineStoreDbContext))]
-    partial class OnlineStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250707105536_AddBrand")]
+    partial class AddBrand
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,25 +24,6 @@ namespace Store.DataAccess.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Store.DataAccess.Entities.BrandEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Brands");
-                });
 
             modelBuilder.Entity("Store.DataAccess.Entities.CategoryEntity", b =>
                 {
@@ -122,9 +106,6 @@ namespace Store.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("BrandId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid");
 
@@ -150,8 +131,6 @@ namespace Store.DataAccess.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BrandId");
 
                     b.HasIndex("CategoryId");
 
@@ -237,25 +216,13 @@ namespace Store.DataAccess.Migrations
 
             modelBuilder.Entity("Store.DataAccess.Entities.ProductEntity", b =>
                 {
-                    b.HasOne("Store.DataAccess.Entities.BrandEntity", "Brand")
-                        .WithMany("Products")
-                        .HasForeignKey("BrandId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Store.DataAccess.Entities.CategoryEntity", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Brand");
-
                     b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("Store.DataAccess.Entities.BrandEntity", b =>
-                {
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Store.DataAccess.Entities.CategoryEntity", b =>
