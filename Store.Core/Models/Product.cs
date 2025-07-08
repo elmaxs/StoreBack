@@ -43,8 +43,8 @@ namespace Store.Core.Models
             {
                 error = "Id cant be empty or default value";
             }
-            if (string.IsNullOrEmpty(brandName) || string.IsNullOrEmpty(name) || string.IsNullOrEmpty(description) 
-                || string.IsNullOrEmpty(imageUrl) || string.IsNullOrEmpty(categoryName))
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(description) 
+                || string.IsNullOrEmpty(imageUrl) || string.IsNullOrEmpty(categoryName)) //string.IsNullOrEmpty(brandName) ||
             {
                 error = "Brand, product name, description, image url or category name cant be null or empty";
             }

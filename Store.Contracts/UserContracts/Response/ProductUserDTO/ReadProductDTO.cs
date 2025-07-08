@@ -3,6 +3,8 @@
     public record ReadProductDTO(
         Guid? Id,
         string? Name,
+        Guid? BrandId,
+        string? BrandName,
         string? CategoryName,
         Guid? CategoryId,
         string? ImageURL,

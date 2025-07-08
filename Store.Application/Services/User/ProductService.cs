@@ -18,6 +18,21 @@ namespace Store.Application.Services.User
             _categoryService = categoryService;
         }
 
+        public async Task<ReadProductDTO> GetProductById(Guid id)
+        {
+            if (id == Guid.Empty || id == new Guid())
+                throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
+
+            var product = await _productRepository.GetById(id);
+            if (product is null)
+                throw new NotFound(ErrorMessages.ProductNotFound);
+
+            var productDTO = new ReadProductDTO(product.Id, product.Name, product.BrandId, product.BrandName, product.CategoryName,
+                product.CategoryId, product.ImageUrl, product.Description, product.Price);
+
+            return productDTO;
+        }
+
         /// <summary>
         /// Basic method for get products
         /// </summary>
@@ -53,8 +68,8 @@ namespace Store.Application.Services.User
                     if (products is null || !products.Any())
                         throw new NotFound(ErrorMessages.ProductNotFound);
 
-                    return products.Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, p.CategoryId, p.ImageUrl,
-                        p.Description, p.Price)).ToList();
+                    return products.Select(p => new ReadProductDTO(p.Id, p.Name, p.BrandId, p.BrandName, p.CategoryName, 
+                        p.CategoryId, p.ImageUrl, p.Description, p.Price)).ToList();
                 }
             }
         }
@@ -79,8 +94,8 @@ namespace Store.Application.Services.User
             if (products is null || !products.Any())
                 throw new NotFound(ErrorMessages.ProductNotFound);
 
-            return products.Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, p.CategoryId, p.ImageUrl,
-                        p.Description, p.Price)).ToList();
+            return products.Select(p => new ReadProductDTO(p.Id, p.Name, p.BrandId, p.BrandName, p.CategoryName, p.CategoryId, 
+                p.ImageUrl, p.Description, p.Price)).ToList();
         }
 
         /// <summary>
@@ -93,8 +108,8 @@ namespace Store.Application.Services.User
             var products = await _productRepository.GetFilteredProductsAsync(filter.CategoryId, filter.Order, 
                 filter.Page, filter.PageSize);
 
-            var productDTO = products.Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, p.CategoryId, p.ImageUrl,
-                        p.Description, p.Price)).ToList();
+            var productDTO = products.Select(p => new ReadProductDTO(p.Id, p.Name, p.BrandId, p.BrandName, p.CategoryName,
+                p.CategoryId, p.ImageUrl, p.Description, p.Price)).ToList();
 
             return productDTO;
         }
@@ -127,8 +142,8 @@ namespace Store.Application.Services.User
                 (string categoryName, Guid categoryId) currentCategory = (products.First().CategoryName, 
                     products.First().CategoryId);
 
-                readProductDTO = products.Select(p => new ReadProductDTO(p.Id, p.Name, p.CategoryName, p.CategoryId, p.ImageUrl,
-                        p.Description, p.Price)).ToList();
+                readProductDTO = products.Select(p => new ReadProductDTO(p.Id, p.Name, p.BrandId, p.BrandName, p.CategoryName, 
+                    p.CategoryId, p.ImageUrl, p.Description, p.Price)).ToList();
 
                 result.Add(new ReadProductBlockDTO(currentCategory.categoryId, currentCategory.categoryName,
                     readProductDTO));

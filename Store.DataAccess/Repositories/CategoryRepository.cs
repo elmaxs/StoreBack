@@ -38,8 +38,8 @@ namespace Store.DataAccess.Repositories
 
         public async Task<IEnumerable<Category>> GetMains()
         {
-            var categoriesEntity = await _context.Categories.Include(c => c.Products).Include(c => c.Subcategories)
-                .Where(c => c.ParentCategoryId == null).ToListAsync();
+            var categoriesEntity = await _context.Categories.Include(c => c.Products).ThenInclude(p => p.Brand)
+                .Include(c => c.Subcategories).Where(c => c.ParentCategoryId == null).ToListAsync();
             if (categoriesEntity is null)
                 return null;
 
@@ -53,6 +53,7 @@ namespace Store.DataAccess.Repositories
         {
             var categoriesEntity = await _context.Categories
                 .Include(c => c.Products)
+                .ThenInclude(p => p.Brand)
                 .Include(c => c.Subcategories)
                 .ToListAsync();
 
@@ -104,8 +105,8 @@ namespace Store.DataAccess.Repositories
 
         public async Task<Category>? GetById(Guid id)
         {
-            var categoryEntity = await _context.Categories.Include(c => c.Products).Include(c => c.Subcategories)
-                .FirstOrDefaultAsync(c => c.Id == id);
+            var categoryEntity = await _context.Categories.Include(c => c.Products).ThenInclude(p => p.Brand)
+                .Include(c => c.Subcategories).FirstOrDefaultAsync(c => c.Id == id);
             if (categoryEntity is null)
                 return null;
 

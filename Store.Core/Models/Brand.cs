@@ -17,22 +17,20 @@
             Products = products;
         }
 
-        public static (Brand Brand, string Error) CreateBrand(Guid id, string name, string description, List<Product> products)
+        public static (Brand? Brand, string? Error) CreateBrand(Guid id, string name, string description, List<Product> products)
         {
-            string error = string.Empty;
-
             if (id == Guid.Empty || id == new Guid())
             {
-                error = "Id cant be empty or default value";
+                return (null, "Id cant be empty or default value");
             }
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(description))
             {
-                error = "Brand name or description cant be null or empty";
+                return (null, "Brand name or description cant be null or empty");
             }
 
             var brand = new Brand(id, name, description, products);
 
-            return (brand, error);
+            return (brand, null);
         }
     }
 }

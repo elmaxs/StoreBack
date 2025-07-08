@@ -1,7 +1,9 @@
-﻿namespace Store.Contracts.AdminContracts.Request.BrandDTO
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Store.Contracts.AdminContracts.Request.BrandDTO
 {
     public record AdminCreateBrandDTO(
-        string Name,
-        string Description
+        [Required] string Name,
+        [Required] string Description
         );
 }

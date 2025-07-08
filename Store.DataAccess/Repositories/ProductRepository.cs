@@ -49,7 +49,7 @@ namespace Store.DataAccess.Repositories
                 return null;
 
             var products = productsEntity.Select(p => Product.CreateProduct(p.Id, p.Name, p.Description, p.ImageUrl, 
-                p.Price, p.CategoryId, p.Category.Name, p.BrandId, p.Brand.Name, p.StockQuantity).Product).ToList();
+                p.Price, p.CategoryId, p.Category.Name, p.BrandId, p.Brand?.Name ?? "Unknown brand", p.StockQuantity).Product).ToList();
 
             return products;
         }
@@ -64,7 +64,7 @@ namespace Store.DataAccess.Repositories
 
             var product = Product.CreateProduct(productEntity.Id, productEntity.Name,
                 productEntity.Description, productEntity.ImageUrl, productEntity.Price, productEntity.CategoryId, 
-                productEntity.Category.Name, productEntity.BrandId, productEntity.Brand.Name, productEntity.StockQuantity).Product;
+                productEntity.Category.Name, productEntity.BrandId, productEntity.Brand?.Name ?? "Unknown brand", productEntity.StockQuantity).Product;
 
             return product;
         }
@@ -77,7 +77,7 @@ namespace Store.DataAccess.Repositories
                 return null;
 
             var products = productsEntity.Select(p => Product.CreateProduct(p.Id, p.Name, p.Description, p.ImageUrl, 
-                p.Price, p.CategoryId, p.Category.Name, p.BrandId, p.Brand.Name, p.StockQuantity).Product);
+                p.Price, p.CategoryId, p.Category.Name, p.BrandId, p.Brand?.Name??"Unknown brand", p.StockQuantity).Product);
 
             return products;
         }
@@ -88,7 +88,7 @@ namespace Store.DataAccess.Repositories
                 .Include(p => p.Category).Include(p => p.Brand).ToListAsync();
 
             return productsEntity.Select(p => Product.CreateProduct(p.Id, p.Name, p.Description, p.ImageUrl, p.Price,
-                p.CategoryId, p.Category.Name, p.BrandId, p.Brand.Name, p.StockQuantity).Product);
+                p.CategoryId, p.Category.Name, p.BrandId, p.Brand?.Name ?? "Unknown brand", p.StockQuantity).Product);
         }
 
         public async Task<Guid> Update(Guid id, Product product)
@@ -129,7 +129,7 @@ namespace Store.DataAccess.Repositories
             var productsEntity = await query.ToListAsync();
 
             return productsEntity.Select(p => Product.CreateProduct(p.Id, p.Name, p.Description, p.ImageUrl, p.Price,
-                p.CategoryId, p.Category.Name, p.BrandId, p.Brand.Name, p.StockQuantity).Product).ToList();
+                p.CategoryId, p.Category.Name, p.BrandId, p.Brand?.Name ?? "Unknown brand"  , p.StockQuantity).Product).ToList();
 
             //return await MappingFiltered(await query.ToListAsync());
         }

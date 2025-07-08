@@ -17,6 +17,21 @@ namespace Store.API.Controllers.User
             _productService = productService;
         }
 
+        [HttpGet("product/{id:guid}")]
+        public async Task<ActionResult<ReadProductDTO>> GetProductById(Guid id)
+        {
+            try
+            {
+                var product = await _productService.GetProductById(id);
+
+                return Ok(product);
+            }
+            catch(Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
         [HttpGet("products-byCategory")]
         public async Task<ActionResult<List<ReadProductDTO>>> GetProductsByCategory([FromQuery] Guid categoryId,
             bool includeSubcategories, int page = 1, int pageSize = 4)

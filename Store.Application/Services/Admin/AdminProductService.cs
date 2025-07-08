@@ -35,8 +35,8 @@ namespace Store.Application.Services.Admin
             if (brand is null)
                 throw new NotFound(ErrorMessages.BrandNotFound);
 
-            var (product, error) = Product.CreateProduct(id, productDTO.Name, productDTO.Description, productDTO.ImageUrl, productDTO.Price,
-                productDTO.CategoryId, category.CategoryName, brand.Id, brand.Name, productDTO.StockQuantity);
+            var (product, error) = Product.CreateProduct(id, productDTO.Name, productDTO.Description, productDTO.ImageUrl,
+                productDTO.Price, productDTO.CategoryId, category.CategoryName, brand.Id, brand.Name, productDTO.StockQuantity);
             if (!string.IsNullOrEmpty(error))
                 throw new ErrorDuringCreation(error);
 
@@ -85,6 +85,7 @@ namespace Store.Application.Services.Admin
             var productDTO = new AdminReadProductDTO(
                 product.Id,
                 product.CategoryId,
+                product.BrandId,
                 product.Name,
                 product.Description,
                 product.ImageUrl,
@@ -104,6 +105,7 @@ namespace Store.Application.Services.Admin
             if (product is null)
                 throw new NotFound(ErrorMessages.ProductNotFound);
 
+            product.BrandId = productDTO.BrandId;
             product.CategoryId = productDTO.CategoryId;
             product.Name = productDTO.Name;
             product.Description = productDTO.Description;
