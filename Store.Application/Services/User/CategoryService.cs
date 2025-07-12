@@ -19,6 +19,55 @@ namespace Store.Application.Services.User
             _productRepository = productRepository;
         }
 
+        public async Task<IEnumerable<ReadSubCategoriesDTO>> GetSucategories(Guid currentCategoryId)
+        {
+            if (currentCategoryId == Guid.Empty || currentCategoryId == new Guid())
+                throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
+
+            var res = new List<ReadSubCategoriesDTO>();
+
+            var category = await _categoryRepository.GetById(currentCategoryId);
+            if (category is null)
+                throw new NotFound(ErrorMessages.CategoryNotFound);
+
+            if (category.Subcategories.Any())
+            {
+                foreach(var subcat in category.Subcategories)
+                {
+                    res.Add(await MappForGetSubcategories(subcat.Id));
+                }
+            }
+
+            return res;
+        }
+
+        private async Task<ReadSubCategoriesDTO> MappForGetSubcategories(Guid categoryId)
+        {
+            var category = await _categoryRepository.GetById(categoryId);
+            if (category is null)
+                throw new NotFound(ErrorMessages.CategoryNotFound);
+
+            bool hasParent = true;
+            var subcategories = new List<Subcategory>();
+
+            if(category.Subcategories.Any())
+            {
+                foreach(var sub in category.Subcategories)
+                {
+                    subcategories.Add(new Subcategory(sub.Id, sub.CategoryName));
+                }
+            }
+
+            if(category.ParentCategoryId is null || category.ParentCategoryId == Guid.Empty 
+                || category.ParentCategoryId == new Guid())
+            {
+                hasParent = false;
+            }
+
+            return new ReadSubCategoriesDTO(category.Id, category.CategoryName, category.Products.Any(),
+                category.Subcategories.Any(), hasParent, subcategories);
+        }
+
         public async Task<bool> CategoryHasProducts(Guid categoryId)
         {
             var countProducts = await _categoryRepository.GetCountProductInCategory(categoryId);

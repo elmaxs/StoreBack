@@ -16,6 +16,21 @@ namespace Store.API.Controllers.User
             _categoryService = categoryService;
         }
 
+        [HttpGet("get-subcategories-{id:guid}")]
+        public async Task<ActionResult<IEnumerable<ReadSubCategoriesDTO>>> GetSubCategories(Guid id)
+        {
+            try
+            {
+                var result = await _categoryService.GetSucategories(id);
+
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpGet("get-mains")]
         public async Task<ActionResult<IEnumerable<ReadMainCategories>>> GetMainsCategories()
         {
