@@ -41,37 +41,17 @@ namespace Store.Application.Services.User
         /// <returns>List ReadProductDTO</returns>
         /// <exception cref="ValidationException">If category not has products</exception>
         /// <exception cref="NotFound">If products not found</exception>
-        public async Task<IEnumerable<ReadProductDTO>> GetProducts(Guid categoryId, bool includeSubcategories)
+        public async Task<IEnumerable<ReadProductDTO>> GetProducts(Guid categoryId)
         {
             if (categoryId == Guid.Empty || categoryId == new Guid())
                 throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
 
-            if(includeSubcategories)
-            {
-                var result = await GetProductsByCategoryHierarchy(categoryId);
+            var result = await GetProductsByCategoryHierarchy(categoryId);
 
-                if (result is null || !result.Any())
-                    throw new NotFound(ErrorMessages.ProductNotFound);
+            if (result is null || !result.Any())
+                throw new NotFound(ErrorMessages.ProductNotFound);
 
-                return result;
-            }
-            else
-            {
-                var isProductsInCategory = await _categoryService.CategoryHasProducts(categoryId);
-
-                if (!isProductsInCategory)
-                    throw new ValidationException(ErrorMessages.CategoryNotHasProducts);
-
-                else
-                {
-                    var products = await _productRepository.GetByCategoryId(categoryId);
-                    if (products is null || !products.Any())
-                        throw new NotFound(ErrorMessages.ProductNotFound);
-
-                    return products.Select(p => new ReadProductDTO(p.Id, p.Name, p.BrandId, p.BrandName, p.CategoryName, 
-                        p.CategoryId, p.ImageUrl, p.Description, p.Price)).ToList();
-                }
-            }
+            return result;
         }
 
         /// <summary>

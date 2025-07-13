@@ -34,11 +34,11 @@ namespace Store.API.Controllers.User
 
         [HttpGet("products-byCategory")]
         public async Task<ActionResult<List<ReadProductDTO>>> GetProductsByCategory([FromQuery] Guid categoryId,
-            bool includeSubcategories, int page = 1, int pageSize = 4)
+            int page = 1, int pageSize = 4)
         {
             try
             {
-                var products = await _productService.GetProducts(categoryId, includeSubcategories);
+                var products = await _productService.GetProducts(categoryId);
 
                 return Ok(products);
             }

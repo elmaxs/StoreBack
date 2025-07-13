@@ -19,12 +19,21 @@ namespace Store.Application.Services.User
             _productRepository = productRepository;
         }
 
-        public async Task<IEnumerable<ReadSubCategoriesDTO>> GetSucategories(Guid currentCategoryId)
+        public async Task<ReadSubcategoriesDTO> GetSubcategories(Guid currentCategoryId)
         {
+            bool IsHasParent(Guid? parentCategoryId)
+            {
+                if (parentCategoryId is null || parentCategoryId == Guid.Empty
+                || parentCategoryId == new Guid())
+                    return false;
+
+                return true;
+            }
+
             if (currentCategoryId == Guid.Empty || currentCategoryId == new Guid())
                 throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
 
-            var res = new List<ReadSubCategoriesDTO>();
+            var subcategories = new List<ReadSubcategoriesDTO>();
 
             var category = await _categoryRepository.GetById(currentCategoryId);
             if (category is null)
@@ -34,39 +43,99 @@ namespace Store.Application.Services.User
             {
                 foreach(var subcat in category.Subcategories)
                 {
-                    res.Add(await MappForGetSubcategories(subcat.Id));
+                    subcategories.Add(await MappForGetSubcategories(subcat.Id));
                 }
             }
 
-            return res;
+            return new ReadSubcategoriesDTO(category.Id, category.CategoryName, category.Products.Any(), category.Subcategories.Any(),
+                IsHasParent(category.ParentCategoryId), subcategories);
         }
 
-        private async Task<ReadSubCategoriesDTO> MappForGetSubcategories(Guid categoryId)
+        private async Task<ReadSubcategoriesDTO> MappForGetSubcategories(Guid categoryId)
         {
+            bool IsHasParent(Guid? parentCategoryId)
+            {
+                if (parentCategoryId is null || parentCategoryId == Guid.Empty
+                || parentCategoryId == new Guid())
+                    return false;
+
+                return true;
+            }
+
             var category = await _categoryRepository.GetById(categoryId);
             if (category is null)
                 throw new NotFound(ErrorMessages.CategoryNotFound);
 
-            bool hasParent = true;
-            var subcategories = new List<Subcategory>();
+            var subcategories = new List<ReadSubcategoriesDTO>();
 
-            if(category.Subcategories.Any())
+            if (category.Subcategories.Any())
             {
-                foreach(var sub in category.Subcategories)
+                foreach (var sub in category.Subcategories)
                 {
-                    subcategories.Add(new Subcategory(sub.Id, sub.CategoryName));
+                    subcategories.Add(await MappForGetSubcategories(sub.Id));
                 }
             }
 
-            if(category.ParentCategoryId is null || category.ParentCategoryId == Guid.Empty 
-                || category.ParentCategoryId == new Guid())
-            {
-                hasParent = false;
-            }
-
-            return new ReadSubCategoriesDTO(category.Id, category.CategoryName, category.Products.Any(),
-                category.Subcategories.Any(), hasParent, subcategories);
+            return new ReadSubcategoriesDTO(category.Id, category.CategoryName, category.Products.Any(),
+                category.Subcategories.Any(), IsHasParent(category.ParentCategoryId), subcategories);
         }
+
+        //private async Task<ReadSubCategoriesDTO> MappForGetSubcategories(Guid categoryId)
+        //{
+        //    bool IsHasParent(Guid? parentCategoryId)
+        //    {
+        //        if (parentCategoryId is null || parentCategoryId == Guid.Empty
+        //        || parentCategoryId == new Guid())
+        //            return false;
+
+        //        return true;
+        //    }
+
+        //    var category = await _categoryRepository.GetById(categoryId);
+        //    if (category is null)
+        //        throw new NotFound(ErrorMessages.CategoryNotFound);
+
+        //    var subcategories = new List<ReadSubCategoriesDTO>();
+
+        //    if (category.Subcategories.Any())
+        //    {
+        //        foreach (var sub in category.Subcategories)
+        //        {
+        //            subcategories.Add(new ReadSubCategoriesDTO(sub.Id, sub.CategoryName, sub.Products.Any(),
+        //                sub.Subcategories.Any(), IsHasParent(sub.ParentCategoryId), new List<ReadSubCategoriesDTO>()));
+        //        }
+        //    }
+
+        //    return new ReadSubCategoriesDTO(category.Id, category.CategoryName, category.Products.Any(),
+        //        category.Subcategories.Any(), IsHasParent(category.ParentCategoryId), subcategories);
+        //}
+
+        //private async Task<ReadSubCategoriesDTO> MappForGetSubcategories(Guid categoryId)
+        //{
+        //    var category = await _categoryRepository.GetById(categoryId);
+        //    if (category is null)
+        //        throw new NotFound(ErrorMessages.CategoryNotFound);
+
+        //    bool hasParent = true;
+        //    var subcategories = new List<Subcategory>();
+
+        //    if (category.Subcategories.Any())
+        //    {
+        //        foreach (var sub in category.Subcategories)
+        //        {
+        //            subcategories.Add(new Subcategory(sub.Id, sub.CategoryName));
+        //        }
+        //    }
+
+        //    if (category.ParentCategoryId is null || category.ParentCategoryId == Guid.Empty
+        //        || category.ParentCategoryId == new Guid())
+        //    {
+        //        hasParent = false;
+        //    }
+
+        //    return new ReadSubCategoriesDTO(category.Id, category.CategoryName, category.Products.Any(),
+        //        category.Subcategories.Any(), hasParent, subcategories);
+        //}
 
         public async Task<bool> CategoryHasProducts(Guid categoryId)
         {

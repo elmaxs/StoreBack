@@ -10,6 +10,6 @@ namespace Store.Application.Abstractions.User
         Task<IEnumerable<(Guid, string)>> GetAllNestedCategoryIdsAndNames(Guid categoryId);
         Task<IEnumerable<CategoriesForMainDTO>> GetCategoriesForMainPage();
         Task<bool> CategoryHasProducts(Guid categoryId);
-        Task<IEnumerable<ReadSubCategoriesDTO>> GetSucategories(Guid currentCategoryId);
+        Task<ReadSubcategoriesDTO> GetSubcategories(Guid currentCategoryId);
     }
 }

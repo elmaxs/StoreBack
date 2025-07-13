@@ -17,11 +17,11 @@ namespace Store.API.Controllers.User
         }
 
         [HttpGet("get-subcategories-{id:guid}")]
-        public async Task<ActionResult<IEnumerable<ReadSubCategoriesDTO>>> GetSubCategories(Guid id)
+        public async Task<ActionResult<ReadSubcategoriesDTO>> GetSubCategories(Guid id)
         {
             try
             {
-                var result = await _categoryService.GetSucategories(id);
+                var result = await _categoryService.GetSubcategories(id);
 
                 return Ok(result);
             }
