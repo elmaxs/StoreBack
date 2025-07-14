@@ -3,6 +3,7 @@
     public record ReadSubcategoriesDTO(
         Guid Id,
         string Name,
+        string TitleImg,
         bool HasProducts,
         bool HasSubcategories,
         bool HasParentCategory,

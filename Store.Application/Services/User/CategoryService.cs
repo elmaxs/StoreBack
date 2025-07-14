@@ -33,22 +33,31 @@ namespace Store.Application.Services.User
             if (currentCategoryId == Guid.Empty || currentCategoryId == new Guid())
                 throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
 
+            var titleImg = "";
             var subcategories = new List<ReadSubcategoriesDTO>();
 
             var category = await _categoryRepository.GetById(currentCategoryId);
             if (category is null)
                 throw new NotFound(ErrorMessages.CategoryNotFound);
 
+            if (category.Products is not null && category.Products.Any())
+                titleImg = category.Products.First().ImageUrl;
+            
             if (category.Subcategories.Any())
             {
-                foreach(var subcat in category.Subcategories)
+                foreach (var subcat in category.Subcategories)
                 {
                     subcategories.Add(await MappForGetSubcategories(subcat.Id));
                 }
+                titleImg = subcategories.Last().TitleImg;
+            }
+            else
+            {
+                titleImg = category.Products.First().ImageUrl;
             }
 
-            return new ReadSubcategoriesDTO(category.Id, category.CategoryName, category.Products.Any(), category.Subcategories.Any(),
-                IsHasParent(category.ParentCategoryId), subcategories);
+                return new ReadSubcategoriesDTO(category.Id, category.CategoryName, titleImg, category.Products.Any(),
+                    category.Subcategories.Any(), IsHasParent(category.ParentCategoryId), subcategories);
         }
 
         private async Task<ReadSubcategoriesDTO> MappForGetSubcategories(Guid categoryId)
@@ -67,16 +76,27 @@ namespace Store.Application.Services.User
                 throw new NotFound(ErrorMessages.CategoryNotFound);
 
             var subcategories = new List<ReadSubcategoriesDTO>();
+            var titleImg = "";
+
+            if (category.Products is not null && category.Products.Any())
+                titleImg = category.Products.First().ImageUrl;
 
             if (category.Subcategories.Any())
             {
                 foreach (var sub in category.Subcategories)
                 {
-                    subcategories.Add(await MappForGetSubcategories(sub.Id));
+                    var subc = await MappForGetSubcategories(sub.Id);
+                    if (!string.IsNullOrEmpty(subc.TitleImg))
+                        titleImg = subc.TitleImg;
+
+                    var s = new ReadSubcategoriesDTO(subc.Id, subc.Name, titleImg, subc.HasProducts, subc.HasSubcategories,
+                        subc.HasParentCategory, subc.Subcategories);
+
+                    subcategories.Add(s);
                 }
             }
 
-            return new ReadSubcategoriesDTO(category.Id, category.CategoryName, category.Products.Any(),
+            return new ReadSubcategoriesDTO(category.Id, category.CategoryName, titleImg, category.Products.Any(),
                 category.Subcategories.Any(), IsHasParent(category.ParentCategoryId), subcategories);
         }
 
