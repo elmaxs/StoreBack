@@ -9,5 +9,6 @@ namespace Store.Core.Abstractions.Repository
         Task<User>? GetById(Guid id);
         Task<Guid> Update(Guid id, User user);
         Task<Guid> Delete(Guid id);
+        Task<User>? GetByEmail(string email);
     }
 }

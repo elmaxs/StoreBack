@@ -6,17 +6,18 @@ namespace Store.Core.Models
     {
         public Guid Id { get; }
 
-        public string FullName { get; set; }
+        public string? FullName { get; set; }
         public string Username { get; set; }
+        public string PasswordHash { get; set; }
         public string Email { get; set; }
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
         public UserRole Role { get; set; }
         public bool IsActive { get; set; } = false;
         public DateTime CreatedAt { get; }
 
-        private User(Guid id, string fullName, string username, string email, string phoneNumber, UserRole role, 
-            DateTime createdAt)
+        private User(Guid id, string? fullName, string username, string passwordHash, string email, string? phoneNumber, 
+            UserRole role, DateTime createdAt)
         {
             Id = id;
             FullName = fullName;
@@ -27,8 +28,8 @@ namespace Store.Core.Models
             CreatedAt = createdAt;
         }
 
-        public static (User User, string Error) CreateUser(Guid id, string fullName, string username, string email, 
-            string phoneNumber, UserRole role, DateTime createdAt)
+        public static (User User, string Error) CreateUser(Guid id, string? fullName, string username, string passwordHash, 
+            string email, string? phoneNumber, UserRole role, DateTime createdAt)
         {
             string error = string.Empty;
 
@@ -36,12 +37,13 @@ namespace Store.Core.Models
             {
                 error = "Id cant be empty or default value";
             }
-            if (string.IsNullOrEmpty(fullName) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email))
+            if (string.IsNullOrEmpty(passwordHash) || string.IsNullOrEmpty(username) 
+                || string.IsNullOrEmpty(email))
             {
                 error = "Full name, username, email, phone number and role cant be null or empty";
             }
 
-            var user = new User(id, fullName, username, email, phoneNumber, role, createdAt);
+            var user = new User(id, fullName, username, passwordHash, email, phoneNumber, role, createdAt);
 
             return (user, error);
         }

@@ -6,11 +6,16 @@ using Store.Application.Abstractions.Admin;
 using Store.Application.Services.Admin;
 using Store.Application.Abstractions.User;
 using Store.Application.Services.User;
+using Store.Application.Abstractions.Auth;
+using Store.Infrastructure;
+using Microsoft.AspNetCore.CookiePolicy;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 
 // Add services to the container.
 
@@ -22,12 +27,19 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<OnlineStoreDbContext>(
     options => options.UseNpgsql(connectionString + ";TrustServerCertificate=True"));
 
+builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<AdminSeeder>();
+
+builder.Services.AddScoped<IUserService, UserService>();
+
 //Repo
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IBrandRepository, BrandRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 //Admin services
 builder.Services.AddScoped<IAdminCategoryService, AdminCategoryService>();
@@ -61,12 +73,26 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    MinimumSameSitePolicy = SameSiteMode.Strict,
+    HttpOnly = HttpOnlyPolicy.Always,
+    Secure = CookieSecurePolicy.Always
+});
+
 app.UseCors("AllowReactApp");
 //app.UseCors("AllowAll");//ReactApp
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<AdminSeeder>();
+    await seeder.SeedAsync();
+}
 
 //for front
 //app.UseCors(x =>

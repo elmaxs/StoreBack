@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35825.156 d17.13
+VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Store.API", "Store.API\Store.API.csproj", "{94C4A56A-66EA-46D3-BD66-970CD461D11D}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Store.DataAccess", "Store.DataAccess\Store.DataAccess.csproj", "{7A66B9F7-F2EF-4DF3-B72E-2DA24B0B06D0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Store.Contracts", "Store.Contracts\Store.Contracts.csproj", "{829C1CA2-7028-4801-917F-5A5B9FFDB9B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Store.Infrastructure", "Store.Infrastructure\Store.Infrastructure.csproj", "{F3F8F510-BC56-4C22-863D-29C77D2F7C19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{829C1CA2-7028-4801-917F-5A5B9FFDB9B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{829C1CA2-7028-4801-917F-5A5B9FFDB9B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{829C1CA2-7028-4801-917F-5A5B9FFDB9B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3F8F510-BC56-4C22-863D-29C77D2F7C19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3F8F510-BC56-4C22-863D-29C77D2F7C19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3F8F510-BC56-4C22-863D-29C77D2F7C19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3F8F510-BC56-4C22-863D-29C77D2F7C19}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

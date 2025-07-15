@@ -19,6 +19,7 @@
     <ProjectReference Include="..\Store.Contracts\Store.Contracts.csproj" />
     <ProjectReference Include="..\Store.Core\Store.Core.csproj" />
     <ProjectReference Include="..\Store.DataAccess\Store.DataAccess.csproj" />
+    <ProjectReference Include="..\Store.Infrastructure\Store.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

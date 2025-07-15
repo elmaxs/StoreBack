@@ -20,7 +20,7 @@ namespace Store.DataAccess.Repositories
             {
                 Id = user.Id,
                 Username = user.Username,
-                HashedPassword = "sd",
+                HashedPassword = user.PasswordHash,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 Role = user.Role,
@@ -40,14 +40,26 @@ namespace Store.DataAccess.Repositories
             return id;
         }
 
+        public async Task<User>? GetByEmail(string email)
+        {
+            var userEntity = await _context.Users.AsNoTracking().Where(u => u.Email == email).FirstOrDefaultAsync() ?? null;
+            if (userEntity is null)
+                return null;
+
+            var user = User.CreateUser(userEntity.Id, userEntity.FullName, userEntity.Username, userEntity.HashedPassword,
+                userEntity.Email, userEntity.PhoneNumber, userEntity.Role, userEntity.CreatedAt).User;
+
+            return user;
+        }
+
         public async Task<IEnumerable<User>>? GetAll()
         {
             var usersEntity = await _context.Users.ToListAsync();
             if (usersEntity is null)
                 return null;
 
-            var users = usersEntity.Select(u => User.CreateUser(u.Id, u.FullName, u.Username, u.Email, u.PhoneNumber, 
-                u.Role, u.CreatedAt).User).ToList();
+            var users = usersEntity.Select(u => User.CreateUser(u.Id, u.FullName, u.Username, u.HashedPassword, u.Email, 
+                u.PhoneNumber, u.Role, u.CreatedAt).User).ToList();
 
             return users;
         }
@@ -58,8 +70,8 @@ namespace Store.DataAccess.Repositories
             if (userEntity is null)
                 return null;
 
-            var user = User.CreateUser(userEntity.Id, userEntity.FullName, userEntity.Username, userEntity.Email,
-                userEntity.PhoneNumber, userEntity.Role, userEntity.CreatedAt).User;
+            var user = User.CreateUser(userEntity.Id, userEntity.FullName, userEntity.Username, userEntity.HashedPassword,
+                userEntity.Email, userEntity.PhoneNumber, userEntity.Role, userEntity.CreatedAt).User;
 
             return user;
         }
