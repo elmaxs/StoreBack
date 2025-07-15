@@ -9,13 +9,11 @@ namespace Store.API.Controllers.User
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly HttpContext _httpContext;
         private readonly IUserService _userService;
 
-        public UserController(IUserService userService, HttpContext httpContext)
+        public UserController(IUserService userService)
         {
             _userService = userService;
-            _httpContext = httpContext;
         }
 
         [HttpPost("register")]
@@ -30,7 +28,7 @@ namespace Store.API.Controllers.User
         {
             var token = await _userService.Login(request.Email, request.Password);
 
-            _httpContext.Response.Cookies.Append("testy-cookies", token);
+            HttpContext.Response.Cookies.Append("testy-cookies", token);
 
             return Ok();
         }

@@ -22,6 +22,7 @@ namespace Store.Core.Models
             Id = id;
             FullName = fullName;
             Username = username;
+            PasswordHash = passwordHash;
             Email = email;
             PhoneNumber = phoneNumber;
             Role = role;

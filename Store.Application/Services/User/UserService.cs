@@ -40,7 +40,7 @@ namespace Store.Application.Services.User
             var hashedPassword = _passwordHasher.Generate(password);
 
             var (user, error) = Store.Core.Models.User.CreateUser(Guid.NewGuid(), null, userName, hashedPassword, email,
-                null, Core.Enums.UserRole.Customer, DateTime.Now);
+                null, Core.Enums.UserRole.Customer, DateTime.UtcNow);
 
             if (!string.IsNullOrEmpty(error))
                 throw new ValidationException(error);
