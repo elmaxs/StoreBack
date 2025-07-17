@@ -4,6 +4,7 @@
     {
         public const string GuidCannotBeEmpty = "Id cant be empty Guid!";
         public const string CategoryNotFound = "Category not found";
+        public const string ProductReviewNotFound = "Product review not found";
         public const string ProductNotFound = "Product not found";
         public const string OrderNotFound = "Order not found";
         public const string BrandNotFound = "Brand not found";

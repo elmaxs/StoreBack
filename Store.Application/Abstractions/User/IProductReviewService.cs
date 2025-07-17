@@ -1,0 +1,15 @@
+﻿using Store.Contracts.UserContracts.Request.ProductReviewDTO;
+using Store.Contracts.UserContracts.Response.ProductReviewDTO;
+using Store.Core.Models;
+
+namespace Store.Application.Abstractions.User
+{
+    public interface IProductReviewService
+    {
+        Task<Guid> CreateProductReview(CreateProductReviewDTO reviewDTO);
+        Task<Guid> DeleteProductReview(Guid id);
+        Task<ReadProductReviewDTO> GetProductReviewById(Guid id);
+        Task<List<ReadProductReviewDTO>> GetAllProductReviews();
+        Task<Guid> UpdateProductReview(Guid id, UpdateProductReviewDTO reviewDTO);
+    }
+}

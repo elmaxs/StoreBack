@@ -15,6 +15,7 @@ namespace Store.DataAccess.Entities
         public UserRole Role { get; set; } = UserRole.Customer;
         public DateTime CreatedAt { get; set; }
 
+        public ICollection<ProductReviewEntity> Reviews { get; set; } = new List<ProductReviewEntity>();
         public ICollection<OrderEntity> Orders { get; set; } = new List<OrderEntity>();
     }
 }

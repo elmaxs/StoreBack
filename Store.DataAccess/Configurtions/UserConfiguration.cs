@@ -14,6 +14,11 @@ namespace Store.DataAccess.Configurtions
                 .WithOne(o => o.User)
                 .HasForeignKey(o => o.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(u => u.Reviews)
+                .WithOne(pr => pr.User)
+                .HasForeignKey(pr => pr.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
     }

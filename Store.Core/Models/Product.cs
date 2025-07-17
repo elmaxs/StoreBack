@@ -35,7 +35,8 @@ namespace Store.Core.Models
         }
 
         public static (Product Product, string Error) CreateProduct(Guid id, string name, string description, 
-            string imageUrl, decimal price, Guid categoryId, string categoryName, Guid? brandId, string? brandName, int stockQuantity)
+            string imageUrl, decimal price, Guid categoryId, string categoryName, Guid? brandId, 
+            string? brandName, int stockQuantity)
         {
             string error = string.Empty;
 
