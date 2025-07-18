@@ -32,5 +32,13 @@ namespace Store.API.Controllers
 
             return Ok(token);
         }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("testy-cookies");
+
+            return Ok();
+        }
     }
 }

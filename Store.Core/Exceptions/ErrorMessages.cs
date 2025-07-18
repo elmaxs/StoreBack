@@ -2,7 +2,9 @@
 {
     public static class ErrorMessages
     {
+        public const string ProductIsNotInCart = "Product is not in cart!";
         public const string GuidCannotBeEmpty = "Id cant be empty Guid!";
+        public const string CartNotFound = "Cart not found";
         public const string CategoryNotFound = "Category not found";
         public const string ProductReviewNotFound = "Product review not found";
         public const string ProductNotFound = "Product not found";

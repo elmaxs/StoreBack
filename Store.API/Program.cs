@@ -81,6 +81,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductReviewRepository, ProductReviewRepository>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
 
 //Admin services
 builder.Services.AddScoped<IAdminCategoryService, AdminCategoryService>();
@@ -93,6 +94,7 @@ builder.Services.AddScoped<IAdminBrandService, AdminBrandService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductReviewService, ProductReviewService>();
+builder.Services.AddScoped<ICartService, CartService>();
 
 builder.Services.AddCors(options =>
 {

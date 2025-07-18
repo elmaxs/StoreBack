@@ -6,6 +6,8 @@ namespace Store.DataAccess.Entities
     {
         public Guid Id { get; set; }
 
+        public CartEntity? Cart { get; set; }
+
         public string? FullName { get; set; }
         public string Username { get; set; } = null!;
         public string HashedPassword { get; set; } = null!;

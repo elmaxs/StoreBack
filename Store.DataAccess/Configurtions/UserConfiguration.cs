@@ -19,6 +19,11 @@ namespace Store.DataAccess.Configurtions
                 .WithOne(pr => pr.User)
                 .HasForeignKey(pr => pr.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(u => u.Cart)
+                .WithOne(c => c.User)
+                .HasForeignKey<CartEntity>(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
     }

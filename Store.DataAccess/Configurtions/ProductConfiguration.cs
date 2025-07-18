@@ -29,6 +29,11 @@ namespace Store.DataAccess.Configurtions
                 .WithOne(pr => pr.Product)
                 .HasForeignKey(pr => pr.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(p => p.CartItems)
+                .WithOne(i => i.Product)
+                .HasForeignKey(i => i.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

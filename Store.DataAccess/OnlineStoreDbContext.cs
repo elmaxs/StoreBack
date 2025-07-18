@@ -15,6 +15,8 @@ namespace Store.DataAccess
         public DbSet<ProductEntity> Products { get; set; }
         public DbSet<CategoryEntity> Categories { get; set; }
         public DbSet<ProductReviewEntity> ProductReviews { get; set; }
+        public DbSet<CartEntity> Carts { get; set; }
+        public DbSet<CartItemEntity> CartItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,6 +27,8 @@ namespace Store.DataAccess
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
             modelBuilder.ApplyConfiguration(new BrandConfiguration());
             modelBuilder.ApplyConfiguration(new ProductReviewConfiguration());
+            modelBuilder.ApplyConfiguration(new CartConfiguration());
+            modelBuilder.ApplyConfiguration(new CartItemConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

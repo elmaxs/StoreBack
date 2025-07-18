@@ -19,6 +19,7 @@
 
         public bool IsAvailable { get; set; }
 
+        public ICollection<CartItemEntity> CartItems { get; set; } = new List<CartItemEntity>();
         public ICollection<ProductReviewEntity> Reviews { get; set; } = new List<ProductReviewEntity>();
         public ICollection<OrderItemEntity> OrderItems { get; set; } = new List<OrderItemEntity>();
     }
