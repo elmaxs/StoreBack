@@ -7,7 +7,6 @@ using Store.Contracts.UserContracts.Response.ProductReviewDTO;
 
 namespace Store.API.Controllers.User
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductReviewController : ControllerBase
@@ -49,7 +48,8 @@ namespace Store.API.Controllers.User
             }
         }
 
-        [HttpGet("create")]
+        [Authorize]
+        [HttpPost("create")]
         public async Task<ActionResult<Guid>> CreateProductReview([FromBody] CreateProductReviewDTO request)
         {
             if (!ModelState.IsValid)
@@ -67,7 +67,8 @@ namespace Store.API.Controllers.User
             }
         }
 
-        [HttpGet("delete/{id:guid}")]
+        [Authorize]
+        [HttpDelete("delete/{id:guid}")]
         public async Task<ActionResult<Guid>> DeleteReview(Guid id)
         {
             try
@@ -82,7 +83,8 @@ namespace Store.API.Controllers.User
             }
         }
 
-        [HttpGet("update/{id:guid}")]
+        [Authorize]
+        [HttpPut("update/{id:guid}")]
         public async Task<ActionResult<Guid>> UpdateReview([FromQuery] Guid id, [FromBody] UpdateProductReviewDTO request)
         {
             if (!ModelState.IsValid)
