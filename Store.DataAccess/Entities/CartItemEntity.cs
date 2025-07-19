@@ -13,6 +13,6 @@
         public int Quantity { get; set; }
 
         public decimal UnitPrice { get; set; }
-        public DateTime AddedAt { get; set; } = DateTime.UtcNow;
+        public DateTime AddedAt { get; set; }
     }
 }

@@ -15,9 +15,26 @@ namespace Store.DataAccess.Repositories
             _context = context;
         }
 
+        public async Task<List<Cart>?> GetExpiredCartsAsync(DateTime threshold)
+        {
+            var cartEntity = _context.Carts.Include(c => c.Items).ThenInclude(i => i.Product)
+                .Where(c => c.LastUpdated < threshold && c.Items.Any());
+
+            if (cartEntity is null)
+                return null;
+
+            var cart = cartEntity.Select(c => Cart.CreateCart(c.UserId, c.LastUpdated,
+                c.Items.Select(i =>
+                    CartItem.CreateCartItem(i.ProductId, i.Product.Name, i.Quantity, i.UnitPrice, i.Product.ImageUrl).CartItem)
+                .ToList()).Cart).ToList();
+
+            return cart;
+        }
+
         public async Task<Guid> AddItemAsync(Guid itemId, Guid userId, CartItem item)
         {
-            var cart = await _context.Carts.FirstOrDefaultAsync(c => c.UserId == userId);
+            var cart = await _context.Carts.Include(c => c.Items).ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
             if (cart is null)
                 throw new NotFound(ErrorMessages.CartNotFound);
 
@@ -31,11 +48,17 @@ namespace Store.DataAccess.Repositories
                 AddedAt = DateTime.UtcNow
             };
 
-            cart.Items.Add(cartItem);
+            //cart.Items.Add(cartItem);
+            await _context.CartItems.AddAsync(cartItem);
 
             await _context.SaveChangesAsync();
 
             return userId;
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
         }
 
         public async Task<Guid> ClearCartAsync(Guid userId)
@@ -86,7 +109,7 @@ namespace Store.DataAccess.Repositories
             if (cartItem is null)
                 throw new NotFound(ErrorMessages.ProductIsNotInCart);
 
-            cart.Items.Remove(cartItem);
+            cart.LastUpdated = DateTime.UtcNow;
 
             await _context.CartItems.Where(i => i.Id == cartItem.Id).ExecuteDeleteAsync();
             await _context.SaveChangesAsync();
@@ -106,6 +129,8 @@ namespace Store.DataAccess.Repositories
                 throw new NotFound(ErrorMessages.ProductIsNotInCart);
 
             cartItem.Quantity = newQuantity;
+
+            cart.LastUpdated = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 

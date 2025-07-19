@@ -73,6 +73,8 @@ builder.Services.AddScoped<AdminSeeder>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddHostedService<CartCleanupHostedService>();
+
 //Repo
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();

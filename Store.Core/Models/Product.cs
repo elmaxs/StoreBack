@@ -17,10 +17,12 @@ namespace Store.Core.Models
         public string? BrandName { get; set; }
 
         public int StockQuantity { get; set; }
-        public bool IsAvailable => StockQuantity > 0;
+        public int ReservedQuantity { get; set; }
+        public int AvailableQuantity => StockQuantity - ReservedQuantity;
+        public bool IsAvailable => StockQuantity > 0 && AvailableQuantity > 0;
 
         private Product(Guid id, string name, string description, string imageUrl, decimal price, 
-            Guid categoryId, string categoryName, Guid? brandId, string? brandName, int stockQuantity)
+            Guid categoryId, string categoryName, Guid? brandId, string? brandName, int stockQuantity, int reservedQuantity)
         {
             Id = id;
             Name = name;
@@ -32,11 +34,12 @@ namespace Store.Core.Models
             BrandId = brandId;
             BrandName = brandName;
             StockQuantity = stockQuantity;
+            ReservedQuantity = reservedQuantity;
         }
 
         public static (Product Product, string Error) CreateProduct(Guid id, string name, string description, 
             string imageUrl, decimal price, Guid categoryId, string categoryName, Guid? brandId, 
-            string? brandName, int stockQuantity)
+            string? brandName, int stockQuantity, int reservedQuantity)
         {
             string error = string.Empty;
 
@@ -53,7 +56,7 @@ namespace Store.Core.Models
                 error = "Stock quantity cant be less than 0";
 
             var product = new Product(id, name, description, imageUrl, price, categoryId, categoryName, brandId, 
-                brandName, stockQuantity);
+                brandName, stockQuantity, reservedQuantity);
 
             return (product, error);
         }

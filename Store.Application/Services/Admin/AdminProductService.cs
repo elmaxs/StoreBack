@@ -36,7 +36,8 @@ namespace Store.Application.Services.Admin
                 throw new NotFound(ErrorMessages.BrandNotFound);
 
             var (product, error) = Product.CreateProduct(id, productDTO.Name, productDTO.Description, productDTO.ImageUrl,
-                productDTO.Price, productDTO.CategoryId, category.CategoryName, brand.Id, brand.Name, productDTO.StockQuantity);
+                productDTO.Price, productDTO.CategoryId, category.CategoryName, brand.Id, brand.Name, 
+                productDTO.StockQuantity, 0);
             if (!string.IsNullOrEmpty(error))
                 throw new ErrorDuringCreation(error);
 

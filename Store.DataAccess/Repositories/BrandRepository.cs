@@ -79,7 +79,7 @@ namespace Store.DataAccess.Repositories
 
             var products = productsEntity.Select(p => Product.CreateProduct(p.Id, p.Name, p.Description,
                 p.ImageUrl, p.Price, p.CategoryId, p.Category.Name,
-                brandId, brandName, p.StockQuantity).Product).ToList();
+                brandId, brandName, p.StockQuantity, p.ReservedQuantity).Product).ToList();
 
             return products;
         }

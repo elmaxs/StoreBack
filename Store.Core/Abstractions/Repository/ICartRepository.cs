@@ -10,5 +10,7 @@ namespace Store.Core.Abstractions.Repository
         Task<Guid> UpdateItemQuantityAsync(Guid userId, Guid productId, int newQuantity);
         Task<Guid> ClearCartAsync(Guid userId);
         Task<bool> IsProductInCartAsync(Guid userId, Guid productId);
+        Task<List<Cart>?> GetExpiredCartsAsync(DateTime threshold);
+        Task SaveChangesAsync();
     }
 }

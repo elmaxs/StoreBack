@@ -27,7 +27,13 @@ namespace Store.DataAccess.Repositories
                 CreatedAt = user.CreatedAt
             };
 
+            var cartEntity = new CartEntity
+            {
+                UserId = user.Id
+            };
+
             await _context.Users.AddAsync(userEntity);
+            await _context.Carts.AddAsync(cartEntity);
             await _context.SaveChangesAsync();
 
             return user.Id;

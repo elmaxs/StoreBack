@@ -10,5 +10,6 @@ namespace Store.Application.Abstractions.User
         Task<Guid> ClearCart(Guid userId);
         Task<Guid> UpdateQuantityProductInCart(Guid userId, CartItemDTO dto);
         Task<Guid> DeleteCartItem(Guid userId, Guid productId);
+        Task CleanExpiredCartsAsync();
     }
 }

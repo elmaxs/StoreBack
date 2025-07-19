@@ -18,6 +18,18 @@ namespace Store.Application.Services.User
             _categoryService = categoryService;
         }
 
+        public async Task<bool> IsAvailableQuantity(Guid productId, int quantity)
+        {
+            var product = await _productRepository.GetById(productId);
+            if (product is null)
+                throw new NotFound(ErrorMessages.ProductNotFound);
+
+            if (product.IsAvailable && product.AvailableQuantity > quantity)
+                return true;
+            else
+                return false;
+        }
+
         public async Task<ReadProductDTO> GetProductById(Guid id)
         {
             if (id == Guid.Empty || id == new Guid())
