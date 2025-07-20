@@ -107,7 +107,8 @@ namespace Store.DataAccess.Repositories
                 .SetProperty(p => p.CategoryId, p => product.CategoryId)
                 .SetProperty(p => p.BrandId, p => product.BrandId)
                 .SetProperty(p => p.StockQuantity, p => product.StockQuantity)
-                .SetProperty(p => p.IsAvailable, p => product.IsAvailable));
+                .SetProperty(p => p.IsAvailable, p => product.IsAvailable)
+                .SetProperty(p => p.ReservedQuantity, p => product.ReservedQuantity));
 
             return id;
         }

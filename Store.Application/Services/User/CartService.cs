@@ -48,7 +48,7 @@ namespace Store.Application.Services.User
             if (product is null)
                 throw new NotFound(ErrorMessages.ProductNotFound);
 
-            var isAvailable = product.IsAvailable && product.AvailableQuantity > quantity;
+            var isAvailable = product.IsAvailable && product.AvailableQuantity >= quantity;
 
             return isAvailable ? quantity : product.AvailableQuantity;
         }
@@ -69,19 +69,22 @@ namespace Store.Application.Services.User
 
             var availableQuantity = await GetAvailableQuantity(dto.ProductId, dto.Quantity);
 
-            var (cartItem, error) = CartItem.CreateCartItem(dto.ProductId, product.Name, availableQuantity, 
+            var (cartItem, cartItemError) = CartItem.CreateCartItem(dto.ProductId, product.Name, availableQuantity, 
                 product.Price, product.ImageUrl);
 
-            var updateProduct = Product.CreateProduct(product.Id, product.Name, product.Description, product.ImageUrl,
+            if (!string.IsNullOrEmpty(cartItemError))
+                throw new ValidationException(cartItemError);
+
+            var (updateProduct, updateProductError) = Product.CreateProduct(product.Id, product.Name, product.Description, product.ImageUrl,
                 product.Price, product.CategoryId, product.CategoryName, product.BrandId, product.BrandName,
                 product.StockQuantity, product.ReservedQuantity += availableQuantity);
 
-            await _productRepository.Update(product.Id, product);
+            if (!string.IsNullOrEmpty(updateProductError))
+                throw new ValidationException(updateProductError);
 
-            if (cartItem is not null)
-                return await _cartRepository.AddItemAsync(Guid.NewGuid(), userId, cartItem);
-            else
-                throw new ValidationException(error);
+            await _productRepository.Update(product.Id, updateProduct);
+
+            return await _cartRepository.AddItemAsync(Guid.NewGuid(), userId, cartItem);
         }
 
         public async Task<Guid> ClearCart(Guid userId)
@@ -106,15 +109,17 @@ namespace Store.Application.Services.User
             return await _cartRepository.RemoveItemAsync(userId, productId);
         }
 
-        public async Task<ICollection<ReadCartDTO>> GetCartByUserId(Guid userId)
+        public async Task<ReadCartDTO> GetCartByUserId(Guid userId)
         {
             var cart = await _cartRepository.GetByUserIdAsync(userId);
             if (cart is null)
                 throw new NotFound(ErrorMessages.CartNotFound);
 
-            var dto = new List<ReadCartDTO>();
-            return cart.Items.Select(i => new ReadCartDTO(i.ProductId, i.ProductName, i.ImageUrl, i.Quantity, i.UnitPrice, 
+            var totalPrice = cart.Items.Sum(i => i.TotalPrice);
+            var itemCart = cart.Items.Select(i => new ItemCartDTO(i.ProductId, i.ProductName, i.ImageUrl, i.Quantity, i.UnitPrice, 
                 i.TotalPrice)).ToList();
+
+            return new ReadCartDTO(totalPrice, itemCart);
         }
 
         public async Task<Guid> UpdateQuantityProductInCart(Guid userId, CartItemDTO dto)
@@ -128,13 +133,19 @@ namespace Store.Application.Services.User
                 throw new NotFound(ErrorMessages.ProductIsNotInCart);
 
             var availableQuantity = await GetAvailableQuantity(dto.ProductId, dto.Quantity);
+            if (availableQuantity <= 0)
+                throw new ValidationException("No available quantity");
 
             var product = await _productRepository.GetById(dto.ProductId);
-            var updateProduct = Product.CreateProduct(product.Id, product.Name, product.Description, product.ImageUrl,
+
+            var (updateProduct, error) = Product.CreateProduct(product.Id, product.Name, product.Description, product.ImageUrl,
                 product.Price, product.CategoryId, product.CategoryName, product.BrandId, product.BrandName,
                 product.StockQuantity, product.ReservedQuantity += availableQuantity);
 
-            await _productRepository.Update(product.Id, product);
+            if (!string.IsNullOrEmpty(error))
+                throw new ValidationException(error);
+
+            await _productRepository.Update(product.Id, updateProduct);
 
             return await _cartRepository.UpdateItemQuantityAsync(userId, dto.ProductId, cartItem.Quantity + availableQuantity);
         }

@@ -5,7 +5,7 @@ namespace Store.Application.Abstractions.User
 {
     public interface ICartService
     {
-        Task<ICollection<ReadCartDTO>> GetCartByUserId(Guid userId);
+        Task<ReadCartDTO> GetCartByUserId(Guid userId);
         Task<Guid> AddCartItem(Guid userId, CartItemDTO dto);
         Task<Guid> ClearCart(Guid userId);
         Task<Guid> UpdateQuantityProductInCart(Guid userId, CartItemDTO dto);

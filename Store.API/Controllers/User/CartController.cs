@@ -43,7 +43,7 @@ namespace Store.API.Controllers.User
         }
 
         [HttpGet("cart")]
-        public async Task<ActionResult<ICollection<ReadCartDTO>>> GetCart()
+        public async Task<ActionResult<ReadCartDTO>> GetCart()
         {
             try
             {
