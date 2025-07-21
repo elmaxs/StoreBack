@@ -42,6 +42,25 @@ namespace Store.API.Controllers.User
             }
         }
 
+        [HttpGet("items/ids")]
+        public async Task<ActionResult<ICollection<ProductIdsInCartDTO>>> GetProductIdsInCart()
+        {
+            try
+            {
+                var userId = User.FindFirst("userId")?.Value;
+                if (userId is null)
+                    return Unauthorized();
+
+                var result = await _cartService.GetProductIdsInCarts(Guid.Parse(userId));
+
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpGet("cart")]
         public async Task<ActionResult<ReadCartDTO>> GetCart()
         {

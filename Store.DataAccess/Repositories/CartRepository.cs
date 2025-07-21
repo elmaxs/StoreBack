@@ -51,6 +51,8 @@ namespace Store.DataAccess.Repositories
             //cart.Items.Add(cartItem);
             await _context.CartItems.AddAsync(cartItem);
 
+            cart.LastUpdated = DateTime.UtcNow;
+
             await _context.SaveChangesAsync();
 
             return userId;
@@ -68,6 +70,8 @@ namespace Store.DataAccess.Repositories
                 throw new NotFound(ErrorMessages.CartNotFound);
 
             cart?.Items.Clear();
+
+            cart.LastUpdated = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
@@ -107,11 +111,12 @@ namespace Store.DataAccess.Repositories
 
             var cartItem = cart.Items.FirstOrDefault(p => p.ProductId == productId);
             if (cartItem is null)
-                throw new NotFound(ErrorMessages.ProductIsNotInCart);
+                throw new NotFound(ErrorMessages.ProductIsNotInCart);   
+
+            await _context.CartItems.Where(i => i.Id == cartItem.Id).ExecuteDeleteAsync();
 
             cart.LastUpdated = DateTime.UtcNow;
 
-            await _context.CartItems.Where(i => i.Id == cartItem.Id).ExecuteDeleteAsync();
             await _context.SaveChangesAsync();
 
             return userId;

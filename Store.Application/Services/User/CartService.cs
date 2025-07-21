@@ -35,6 +35,8 @@ namespace Store.Application.Services.User
                         throw new NotFound(ErrorMessages.ProductNotFound);
 
                     product.ReservedQuantity = Math.Max(0, product.ReservedQuantity - item.Quantity);
+                    await _productRepository.Update(product.Id, product);
+                    Console.WriteLine("!!!!!!!!!!!!!!WAS CLEAR!!!!!!!!!!!!!!!!!!!!!!");
                 }
                 await ClearCart(cart.UserId);
                 cart.LastUpdated = DateTime.UtcNow;
@@ -51,6 +53,18 @@ namespace Store.Application.Services.User
             var isAvailable = product.IsAvailable && product.AvailableQuantity >= quantity;
 
             return isAvailable ? quantity : product.AvailableQuantity;
+        }
+
+        public async Task<ICollection<ProductIdsInCartDTO>> GetProductIdsInCarts(Guid userId)
+        {
+            if (userId == Guid.Empty)
+                throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
+
+            var cart = await _cartRepository.GetByUserIdAsync(userId);
+            if (cart is null)
+                throw new NotFound(ErrorMessages.CartNotFound);
+
+            return cart.Items.Select(i => new ProductIdsInCartDTO(i.ProductId)).ToList();
         }
 
         public async Task<Guid> AddCartItem(Guid userId, CartItemDTO dto)
@@ -93,6 +107,18 @@ namespace Store.Application.Services.User
             if (cart is null)
                 throw new NotFound(ErrorMessages.CartNotFound);
 
+            foreach (var item in cart.Items)
+            {
+                var product = await _productRepository.GetById(item.ProductId);
+                if (product is null)
+                    throw new NotFound(ErrorMessages.ProductNotFound);
+
+                product.ReservedQuantity = Math.Max(0, product.ReservedQuantity - item.Quantity);
+                await _productRepository.Update(product.Id, product);
+                Console.WriteLine("!!!!!!!!!!!!!!WAS CLEAR!!!!!!!!!!!!!!!!!!!!!!");
+            }
+            cart.LastUpdated = DateTime.UtcNow;
+
             return await _cartRepository.ClearCartAsync(userId);
         }
 
@@ -105,6 +131,15 @@ namespace Store.Application.Services.User
             var inCart = await _cartRepository.IsProductInCartAsync(userId, productId);
             if (!inCart)
                 throw new ValidationException(ErrorMessages.ProductIsNotInCart);
+
+            var product = await _productRepository.GetById(productId);
+            if (product is null)
+                throw new NotFound(ErrorMessages.ProductNotFound);
+
+            var item = cart.Items.FirstOrDefault(i => i.ProductId == productId);
+
+            product.ReservedQuantity = Math.Max(0, product.ReservedQuantity - item.Quantity);
+            await _productRepository.Update(product.Id, product);
 
             return await _cartRepository.RemoveItemAsync(userId, productId);
         }
@@ -132,22 +167,56 @@ namespace Store.Application.Services.User
             if (cartItem is null)
                 throw new NotFound(ErrorMessages.ProductIsNotInCart);
 
-            var availableQuantity = await GetAvailableQuantity(dto.ProductId, dto.Quantity);
-            if (availableQuantity <= 0)
-                throw new ValidationException("No available quantity");
+            if(cartItem.Quantity < dto.Quantity)
+            {
+                var availableQuantity = await GetAvailableQuantity(dto.ProductId, dto.Quantity-cartItem.Quantity);
+                if (availableQuantity <= 0)
+                    throw new ValidationException("No available quantity");
 
-            var product = await _productRepository.GetById(dto.ProductId);
+                var product = await _productRepository.GetById(dto.ProductId);
 
-            var (updateProduct, error) = Product.CreateProduct(product.Id, product.Name, product.Description, product.ImageUrl,
-                product.Price, product.CategoryId, product.CategoryName, product.BrandId, product.BrandName,
-                product.StockQuantity, product.ReservedQuantity += availableQuantity);
+                var (updateProduct, error) = Product.CreateProduct(product.Id, product.Name, product.Description, product.ImageUrl,
+                    product.Price, product.CategoryId, product.CategoryName, product.BrandId, product.BrandName,
+                    product.StockQuantity, product.ReservedQuantity += availableQuantity);
 
-            if (!string.IsNullOrEmpty(error))
-                throw new ValidationException(error);
+                if (!string.IsNullOrEmpty(error))
+                    throw new ValidationException(error);
 
-            await _productRepository.Update(product.Id, updateProduct);
+                await _productRepository.Update(product.Id, updateProduct);
 
-            return await _cartRepository.UpdateItemQuantityAsync(userId, dto.ProductId, cartItem.Quantity + availableQuantity);
+                return await _cartRepository.UpdateItemQuantityAsync(userId, dto.ProductId, cartItem.Quantity + availableQuantity);
+            }
+            else
+            {
+                var product = await _productRepository.GetById(dto.ProductId);
+
+                var (updateProduct, error) = Product.CreateProduct(product.Id, product.Name, product.Description, product.ImageUrl,
+                    product.Price, product.CategoryId, product.CategoryName, product.BrandId, product.BrandName,
+                    product.StockQuantity, product.ReservedQuantity -= cartItem.Quantity - dto.Quantity);
+
+                if (!string.IsNullOrEmpty(error))
+                    throw new ValidationException(error);
+
+                await _productRepository.Update(product.Id, updateProduct);
+
+                return await _cartRepository.UpdateItemQuantityAsync(userId, dto.ProductId, dto.Quantity);
+            }
+            //    var availableQuantity = await GetAvailableQuantity(dto.ProductId, dto.Quantity);
+            //if (availableQuantity <= 0)
+            //    throw new ValidationException("No available quantity");
+
+            //var product = await _productRepository.GetById(dto.ProductId);
+
+            //var (updateProduct, error) = Product.CreateProduct(product.Id, product.Name, product.Description, product.ImageUrl,
+            //    product.Price, product.CategoryId, product.CategoryName, product.BrandId, product.BrandName,
+            //    product.StockQuantity, product.ReservedQuantity += availableQuantity);
+
+            //if (!string.IsNullOrEmpty(error))
+            //    throw new ValidationException(error);
+
+            //await _productRepository.Update(product.Id, updateProduct);
+
+            //return await _cartRepository.UpdateItemQuantityAsync(userId, dto.ProductId, cartItem.Quantity + availableQuantity);
         }
     }
 }
