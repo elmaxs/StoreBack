@@ -21,7 +21,7 @@ namespace Store.API.Controllers.User
         }
 
         [HttpPost("add")]
-        public async Task<ActionResult<Guid>> AddItemInCart([FromBody] CartItemDTO dto)
+        public async Task<ActionResult<int>> AddItemInCart([FromBody] CartItemDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Bad data");
@@ -81,7 +81,7 @@ namespace Store.API.Controllers.User
         }
 
         [HttpPut("update")]
-        public async Task<ActionResult<Guid>> UpdateCartItem([FromBody] CartItemDTO dto)
+        public async Task<ActionResult<int>> UpdateCartItem([FromBody] CartItemDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Bad data");

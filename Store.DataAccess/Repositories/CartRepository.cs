@@ -25,7 +25,8 @@ namespace Store.DataAccess.Repositories
 
             var cart = cartEntity.Select(c => Cart.CreateCart(c.UserId, c.LastUpdated,
                 c.Items.Select(i =>
-                    CartItem.CreateCartItem(i.ProductId, i.Product.Name, i.Quantity, i.UnitPrice, i.Product.ImageUrl).CartItem)
+                    CartItem.CreateCartItem(i.ProductId, i.Product.Name, i.Quantity, i.Product.AvailableQuantity,
+                    i.UnitPrice, i.Product.ImageUrl).CartItem)
                 .ToList()).Cart).ToList();
 
             return cart;
@@ -86,7 +87,8 @@ namespace Store.DataAccess.Repositories
                 return null;
 
             var cart = Cart.CreateCart(cartEntity.UserId, cartEntity.LastUpdated, cartEntity.Items.Select(i =>
-            CartItem.CreateCartItem(i.ProductId, i.Product.Name, i.Quantity, i.UnitPrice, i.Product.ImageUrl).CartItem)
+            CartItem.CreateCartItem(i.ProductId, i.Product.Name, i.Quantity, i.Product.AvailableQuantity,
+            i.UnitPrice, i.Product.ImageUrl).CartItem)
                 .ToList()).Cart;
 
             return cart;

@@ -40,7 +40,7 @@ namespace Store.Application.Services.User
                 throw new NotFound(ErrorMessages.ProductNotFound);
 
             var productDTO = new ReadProductDTO(product.Id, product.Name, product.BrandId, product.BrandName, product.CategoryName,
-                product.CategoryId, product.ImageUrl, product.Description, product.Price);
+                product.CategoryId, product.ImageUrl, product.Description, product.AvailableQuantity, product.Price);
 
             return productDTO;
         }
@@ -87,7 +87,7 @@ namespace Store.Application.Services.User
                 throw new NotFound(ErrorMessages.ProductNotFound);
 
             return products.Select(p => new ReadProductDTO(p.Id, p.Name, p.BrandId, p.BrandName, p.CategoryName, p.CategoryId, 
-                p.ImageUrl, p.Description, p.Price)).ToList();
+                p.ImageUrl, p.Description, p.AvailableQuantity, p.Price)).ToList();
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Store.Application.Services.User
                 filter.Page, filter.PageSize);
 
             var productDTO = products.Select(p => new ReadProductDTO(p.Id, p.Name, p.BrandId, p.BrandName, p.CategoryName,
-                p.CategoryId, p.ImageUrl, p.Description, p.Price)).ToList();
+                p.CategoryId, p.ImageUrl, p.Description, p.AvailableQuantity, p.Price)).ToList();
 
             return productDTO;
         }
@@ -135,7 +135,7 @@ namespace Store.Application.Services.User
                     products.First().CategoryId);
 
                 readProductDTO = products.Select(p => new ReadProductDTO(p.Id, p.Name, p.BrandId, p.BrandName, p.CategoryName, 
-                    p.CategoryId, p.ImageUrl, p.Description, p.Price)).ToList();
+                    p.CategoryId, p.ImageUrl, p.Description, p.AvailableQuantity, p.Price)).ToList();
 
                 result.Add(new ReadProductBlockDTO(currentCategory.categoryId, currentCategory.categoryName,
                     readProductDTO));

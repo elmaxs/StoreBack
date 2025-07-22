@@ -9,6 +9,7 @@
         string ProductName,
         string ImageUrl,
         int Quantity,
+        int AvailableQuantity,
         decimal UnitPrice,
         decimal TotalPrice);
 }

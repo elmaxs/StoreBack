@@ -9,5 +9,6 @@
         Guid? CategoryId,
         string? ImageURL,
         string? Description,
+        int AvailableQuantity,
         decimal? Price);
 }

@@ -6,13 +6,15 @@
         public string ProductName { get; set; }
 
         public int Quantity { get; set; }
+        public int AvailableQuantity { get; set; }
         public decimal UnitPrice { get; set; }
 
         public string ImageUrl { get; set; }
 
         public decimal TotalPrice => Quantity * UnitPrice;
 
-        private CartItem(Guid productId, string productName, int quantity, decimal unitPrice, string imageUrl)
+        private CartItem(Guid productId, string productName, int quantity, int availableQuantity,
+            decimal unitPrice, string imageUrl)
         {
             ProductId = productId;
             ProductName = productName;
@@ -21,8 +23,8 @@
             ImageUrl = imageUrl;
         }
 
-        public static (CartItem CartItem, string Error) CreateCartItem(Guid productId, string productName, int quantity, decimal unitPrice, 
-            string imageUrl)
+        public static (CartItem CartItem, string Error) CreateCartItem(Guid productId, string productName, 
+            int quantity, int availableQuantity, decimal unitPrice, string imageUrl)
         {
             string error = string.Empty;
 
@@ -37,7 +39,7 @@
             if (unitPrice < 0)
                 error = "Unit price cant be less than 0";
 
-            var cartItem = new CartItem(productId, productName, quantity, unitPrice, imageUrl);
+            var cartItem = new CartItem(productId, productName, quantity, availableQuantity, unitPrice, imageUrl);
 
             return (cartItem, error);
         }
