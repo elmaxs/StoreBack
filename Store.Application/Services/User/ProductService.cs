@@ -18,6 +18,17 @@ namespace Store.Application.Services.User
             _categoryService = categoryService;
         }
 
+        public async Task<IEnumerable<ReadProductDTO>> GetProductsBySearch(string search)
+        {
+            if (string.IsNullOrEmpty(search))
+                return new List<ReadProductDTO>();
+
+            var products = await _productRepository.GetBySearch(search);
+
+            return products.Select(p => new ReadProductDTO(p.Id, p.Name, p.BrandId, p.BrandName, p.CategoryName, p.CategoryId,
+                p.ImageUrl, p.Description, p.AvailableQuantity, p.Price)).ToList();
+        }
+
         public async Task<bool> IsAvailableQuantity(Guid productId, int quantity)
         {
             var product = await _productRepository.GetById(productId);

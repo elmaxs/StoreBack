@@ -19,6 +19,7 @@
             ProductId = productId;
             ProductName = productName;
             Quantity = quantity;
+            AvailableQuantity = availableQuantity;
             UnitPrice = unitPrice;
             ImageUrl = imageUrl;
         }

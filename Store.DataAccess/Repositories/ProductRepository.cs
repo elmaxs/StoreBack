@@ -14,6 +14,19 @@ namespace Store.DataAccess.Repositories
             _context = context;
         }
 
+        public async Task<IEnumerable<Product>> GetBySearch(string search)
+        {
+            var productsEntity = await _context.Products.Include(p => p.Category).Include(p => p.Brand)
+                .Where(p => EF.Functions.Like(p.Name.ToLower(), $"%{search.ToLower()}%") 
+                || EF.Functions.Like(p.Description.ToLower(), $"%{search.ToLower()}%"))
+                .ToListAsync();
+
+            var products = productsEntity.Select(p => Product.CreateProduct(p.Id, p.Name, p.Description, p.ImageUrl, p.Price,
+                p.CategoryId, p.Category.Name, p.BrandId, p.Brand.Name, p.StockQuantity, p.ReservedQuantity).Product).ToList();
+
+            return products;
+        }
+
         public async Task<Guid> Create(Product product)
         {
             var productEntity = new ProductEntity

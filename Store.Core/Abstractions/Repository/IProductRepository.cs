@@ -4,6 +4,7 @@ namespace Store.Core.Abstractions.Repository
 {
     public interface IProductRepository
     {
+        Task<IEnumerable<Product>> GetBySearch(string search);
         Task<Guid> Create(Product product);
         Task<IEnumerable<Product>>? GetAll();
         Task<Product>? GetById(Guid id);

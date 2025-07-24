@@ -17,6 +17,24 @@ namespace Store.API.Controllers.User
             _productService = productService;
         }
 
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<ReadProductDTO>>> GetProductsBySearch([FromQuery] string search)
+        {
+            if (string.IsNullOrEmpty(search))
+                return BadRequest("Enter some text");
+
+            try
+            {
+                var result = await _productService.GetProductsBySearch(search);
+
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpGet("product/{id:guid}")]
         public async Task<ActionResult<ReadProductDTO>> GetProductById(Guid id)
         {
