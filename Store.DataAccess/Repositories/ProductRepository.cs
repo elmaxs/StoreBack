@@ -127,7 +127,8 @@ namespace Store.DataAccess.Repositories
             return id;
         }
 
-        public async Task<List<Product>> GetFilteredProductsAsync(Guid? categoryId, string order, int page, int pageSize)
+        public async Task<List<Product>> GetFilteredProductsAsync(Guid? categoryId, string sortBy, string orderBy, 
+            int page, int pageSize)
         {
             var query = _context.Products.Include(p => p.Category).Include(p => p.Brand).AsQueryable();
 
@@ -136,13 +137,33 @@ namespace Store.DataAccess.Repositories
                 query = query.Where(p => p.CategoryId == categoryId);
             }
 
-            if(order.ToLower() == "desc")
+            switch (sortBy.ToLower())
             {
-                query = query.OrderByDescending(p => p.Price);
-            }
-            else
-            {
-                query = query.OrderBy(p => p.Price);
+                case "price":
+                    if (orderBy.ToLower() == "desc")
+                    {
+                        query = query.OrderByDescending(p => p.Price);
+                    }
+                    else
+                    {
+                        query = query.OrderBy(p => p.Price);
+                    }
+                    break;
+
+                case "name":
+                    if (orderBy.ToLower() == "desc")
+                    {
+                        query = query.OrderByDescending(p => p.Name);
+                    }
+                    else
+                    {
+                        query = query.OrderBy(p => p.Name);
+                    }
+                    break;
+
+                default:
+                    query = query.OrderBy(p => p.Name);
+                    break;
             }
 
             query = query.Skip((page - 1) * pageSize).Take(pageSize);

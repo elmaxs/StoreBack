@@ -3,6 +3,7 @@ using Store.Contracts.UserContracts.Request.ProductUserDTO;
 using Store.Contracts.UserContracts.Response.ProductUserDTO;
 using Store.Core.Abstractions.Repository;
 using Store.Core.Exceptions;
+using Store.Core.Models;
 using ValidationException = Store.Core.Exceptions.ValidationException;
 
 namespace Store.Application.Services.User
@@ -108,13 +109,23 @@ namespace Store.Application.Services.User
         /// <returns>Filtered products by category id, order, page, page size.</returns>
         public async Task<IEnumerable<ReadProductDTO>> GetFilteredProductsAsync(ProductFilterParams filter)
         {
-            var products = await _productRepository.GetFilteredProductsAsync(filter.CategoryId, filter.Order, 
-                filter.Page, filter.PageSize);
+            var categoryIdsAndNames = await _categoryService.GetAllNestedCategoryIdsAndNames(filter.CategoryId);
+            foreach(var id in categoryIdsAndNames)
+            {
+                var isHaveProducts = await _categoryService.CategoryHasProducts(id.Item1);
+                if(isHaveProducts)
+                {
+                    var products = await _productRepository.GetFilteredProductsAsync(id.Item1, filter.Sort, filter.Order,
+                        filter.Page, filter.PageSize);
 
-            var productDTO = products.Select(p => new ReadProductDTO(p.Id, p.Name, p.BrandId, p.BrandName, p.CategoryName,
-                p.CategoryId, p.ImageUrl, p.Description, p.AvailableQuantity, p.Price)).ToList();
+                    var productDTO = products.Select(p => new ReadProductDTO(p.Id, p.Name, p.BrandId, p.BrandName, p.CategoryName, 
+                        p.CategoryId, p.ImageUrl, p.Description, p.AvailableQuantity, p.Price)).ToList();
 
-            return productDTO;
+                    return productDTO;
+                }
+            }
+
+            throw new NotFound(ErrorMessages.ProductNotFound);
         }
 
         //переделать

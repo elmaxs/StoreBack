@@ -11,7 +11,7 @@ namespace Store.Core.Abstractions.Repository
         Task<IEnumerable<Product>>? GetByCategoryId(Guid categoryId);
         Task<Guid> Update(Guid id, Product product);
         Task<Guid> Delete(Guid id);
-        Task<List<Product>> GetFilteredProductsAsync(Guid? categoryId, string order, int page, int pageSize);
+        Task<List<Product>> GetFilteredProductsAsync(Guid? categoryId, string sortBy, string orderBy, int page, int pageSize);
         Task<IEnumerable<Product>>? GetByCategoryIds(IEnumerable<Guid> categoryIds);
     }
 }
