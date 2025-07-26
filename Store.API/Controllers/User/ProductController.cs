@@ -83,6 +83,19 @@ namespace Store.API.Controllers.User
             }
         }
 
+        [HttpGet("products/pages")]
+        public async Task<ActionResult<int>> GetCountPages([FromQuery] Guid categoryId)
+        {
+            try
+            {
+                return await _productService.GetCountPages(categoryId);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpGet("products/filtered")]
         public async Task<ActionResult<List<ReadProductDTO>>> GetFiltered([FromQuery] ProductFilterParams filters)
         {

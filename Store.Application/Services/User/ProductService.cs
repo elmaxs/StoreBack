@@ -118,7 +118,7 @@ namespace Store.Application.Services.User
                     var products = await _productRepository.GetFilteredProductsAsync(id.Item1, filter.Sort, filter.Order,
                         filter.Page, filter.PageSize);
 
-                    var productDTO = products.Select(p => new ReadProductDTO(p.Id, p.Name, p.BrandId, p.BrandName, p.CategoryName, 
+                    var productDTO = products.Select(p => new ReadProductDTO(p.Id, p.Name, p.BrandId, p.BrandName, p.CategoryName,
                         p.CategoryId, p.ImageUrl, p.Description, p.AvailableQuantity, p.Price)).ToList();
 
                     return productDTO;
@@ -126,6 +126,15 @@ namespace Store.Application.Services.User
             }
 
             throw new NotFound(ErrorMessages.ProductNotFound);
+        }
+
+        public async Task<int> GetCountPages(Guid categoryId)
+        {
+            var products = await GetProductsByCategoryHierarchy(categoryId);
+
+            var maxPages = Math.Ceiling((double)products.Count() / 10);
+
+            return (int)maxPages;
         }
 
         //переделать
