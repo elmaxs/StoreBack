@@ -18,6 +18,51 @@ namespace Store.API.Controllers.User
             _productReviewService = productReviewService;
         }
 
+        [HttpGet("product")]
+        public async Task<ActionResult<ICollection<ReadProductReviewDTO>>> GetReviewsForProduct([FromQuery] Guid productId)
+        {
+            try
+            {
+                var result = await _productReviewService.GetReviewsForProduct(productId);
+
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("ratings/info")]
+        public async Task<ActionResult<Dictionary<int,int>>> GetRatingForProduct([FromQuery] Guid productId)
+        {
+            try
+            {
+                var result = await _productReviewService.GetRatingsInfoForProduct(productId);
+
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("average")]
+        public async Task<ActionResult<double>> GetAverageRatingForProduct([FromQuery] Guid productId)
+        {
+            try
+            {
+                var result = await _productReviewService.GetAverageRatingForProduct(productId);
+
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpGet("get-all")]
         public async Task<ActionResult<ICollection<ReadProductReviewDTO>>> GetAllReviews()
         {

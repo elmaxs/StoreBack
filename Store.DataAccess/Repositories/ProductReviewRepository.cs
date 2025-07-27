@@ -14,6 +14,25 @@ namespace Store.DataAccess.Repositories
             _context = context;
         }
 
+        public async Task<ICollection<ProductReview>> GetForProduct(Guid productId)
+        {
+            var reviewsEntity = await _context.ProductReviews.Include(r => r.User)
+                .Where(r => r.ProductId == productId).ToListAsync();
+
+            var reviews = reviewsEntity.Select(r => ProductReview.CreateProductReview(r.Id, r.UserId, r.ProductId, r.User.Username,
+                r.Text, r.Rating, r.CreatedAt).ProductReview).ToList();
+
+            return reviews;
+        }
+
+        public async Task<ICollection<int>> GetRatingsForProduct(Guid productId)
+        {
+            var ratings = await _context.ProductReviews.Where(r => r.ProductId == productId && r.Rating != null)
+                .Select(r => r.Rating!.Value).ToListAsync();
+
+            return ratings;
+        }
+
         public async Task<Guid> Create(ProductReview review)
         {
             var reviewEntity = new ProductReviewEntity

@@ -18,6 +18,51 @@ namespace Store.Application.Services.User
             _userRepository = userRepository;
         }
 
+        public async Task<double> GetAverageRatingForProduct(Guid productId)
+        {
+            if (productId == Guid.Empty)
+                throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
+
+            var ratings = await _productReviewRepo.GetRatingsForProduct(productId);
+            if (ratings.Count() == 0)
+                return 0.0;
+
+            var average = Math.Round(ratings.Average(), 1);
+
+            return average;
+        }
+
+        public async Task<Dictionary<int, int>> GetRatingsInfoForProduct(Guid productId)
+        {
+            if (productId == Guid.Empty)
+                throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
+
+            var ratings = await _productReviewRepo.GetRatingsForProduct(productId);
+            if (ratings.Count() == 0)
+                return new Dictionary<int, int>();
+
+            var total = ratings.Count();
+
+            var distribution = Enumerable.Range(1, 5).ToDictionary(
+                rating => rating,
+                rating => (int)Math.Round((double)ratings.Count(r => r == rating) / total * 100));
+
+            return distribution;
+        }
+
+        public async Task<ICollection<ReadProductReviewDTO>> GetReviewsForProduct(Guid productId)
+        {
+            if (productId == Guid.Empty)
+                throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
+
+            var reviews = await _productReviewRepo.GetForProduct(productId);
+
+            var reviewsDTO = reviews.Select(r => new ReadProductReviewDTO(r.Id, r.UserId, r.UserName, r.Text, 
+                r.Rating, r.CreatedAt)).ToList();
+
+            return reviewsDTO;
+        }
+
         public async Task<Guid> CreateProductReview(CreateProductReviewDTO reviewDTO)
         {
             var user = await _userRepository.GetById(reviewDTO.UserId);

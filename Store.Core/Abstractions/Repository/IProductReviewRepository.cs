@@ -9,5 +9,7 @@ namespace Store.Core.Abstractions.Repository
         Task<ProductReview>? GetById(Guid id);
         Task<List<ProductReview>> GetAll();
         Task<Guid> Update(Guid id, ProductReview review);
+        Task<ICollection<ProductReview>> GetForProduct(Guid productId);
+        Task<ICollection<int>> GetRatingsForProduct(Guid productId); 
     }
 }

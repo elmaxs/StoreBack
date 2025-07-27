@@ -11,5 +11,8 @@ namespace Store.Application.Abstractions.User
         Task<ReadProductReviewDTO> GetProductReviewById(Guid id);
         Task<List<ReadProductReviewDTO>> GetAllProductReviews();
         Task<Guid> UpdateProductReview(Guid id, UpdateProductReviewDTO reviewDTO);
+        Task<ICollection<ReadProductReviewDTO>> GetReviewsForProduct(Guid productId);
+        Task<Dictionary<int, int>> GetRatingsInfoForProduct(Guid productId);
+        Task<double> GetAverageRatingForProduct(Guid productId);
     }
 }
