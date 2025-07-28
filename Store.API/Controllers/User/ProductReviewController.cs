@@ -78,6 +78,21 @@ namespace Store.API.Controllers.User
             }
         }
 
+        [HttpGet("ratings")]
+        public async Task<ActionResult<ReadRatingsDTO>> GetRatings([FromQuery] Guid productId)
+        {
+            try
+            {
+                var result = await _productReviewService.GetRatingsDTO(productId);
+
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpGet("get/{id:guid}")]
         public async Task<ActionResult<ReadProductReviewDTO>> GetReviewById(Guid id)
         {
@@ -102,7 +117,8 @@ namespace Store.API.Controllers.User
 
             try
             {
-                var result = await _productReviewService.CreateProductReview(request);
+                var userId = User.FindFirst("userId")?.Value;
+                var result = await _productReviewService.CreateProductReview(Guid.Parse(userId), request);
 
                 return Ok(result);
             }

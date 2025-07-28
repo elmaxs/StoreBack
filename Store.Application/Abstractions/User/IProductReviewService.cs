@@ -6,7 +6,8 @@ namespace Store.Application.Abstractions.User
 {
     public interface IProductReviewService
     {
-        Task<Guid> CreateProductReview(CreateProductReviewDTO reviewDTO);
+        Task<ReadRatingsDTO> GetRatingsDTO(Guid productId);
+        Task<Guid> CreateProductReview(Guid userId, CreateProductReviewDTO reviewDTO);
         Task<Guid> DeleteProductReview(Guid id);
         Task<ReadProductReviewDTO> GetProductReviewById(Guid id);
         Task<List<ReadProductReviewDTO>> GetAllProductReviews();

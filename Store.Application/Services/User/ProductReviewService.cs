@@ -1,4 +1,5 @@
-﻿using Store.Application.Abstractions.User;
+﻿using Microsoft.VisualBasic;
+using Store.Application.Abstractions.User;
 using Store.Contracts.UserContracts.Request.ProductReviewDTO;
 using Store.Contracts.UserContracts.Response.ProductReviewDTO;
 using Store.Core.Abstractions.Repository;
@@ -63,13 +64,26 @@ namespace Store.Application.Services.User
             return reviewsDTO;
         }
 
-        public async Task<Guid> CreateProductReview(CreateProductReviewDTO reviewDTO)
+        public async Task<ReadRatingsDTO> GetRatingsDTO(Guid productId)
         {
-            var user = await _userRepository.GetById(reviewDTO.UserId);
+            if (productId == Guid.Empty)
+                throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
+
+            var ratings = await _productReviewRepo.GetRatingsForProduct(productId);
+
+            return new ReadRatingsDTO((int)Math.Round(ratings.Average()), ratings.Count());
+        }
+
+        public async Task<Guid> CreateProductReview(Guid userId, CreateProductReviewDTO reviewDTO)
+        {
+            if (userId == Guid.Empty)
+                throw new ValidationException(ErrorMessages.GuidCannotBeEmpty);
+
+            var user = await _userRepository.GetById(userId);
             if (user is null)
                 throw new NotFound(ErrorMessages.UserNotFound);
 
-            var (review, error) = ProductReview.CreateProductReview(Guid.NewGuid(), reviewDTO.UserId, reviewDTO.ProductId,
+            var (review, error) = ProductReview.CreateProductReview(Guid.NewGuid(), userId, reviewDTO.ProductId,
                 user.FullName, reviewDTO.Text, reviewDTO.Rating, DateTime.UtcNow);
 
             if (review is not null)
