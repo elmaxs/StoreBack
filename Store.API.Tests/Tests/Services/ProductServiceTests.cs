@@ -32,7 +32,7 @@ namespace Store.API.Tests.Tests.Services
 
             //Act
             //Виклик методу, який тестується.
-            Func<Task> act = async() => await _productService.GetProductById(empty);
+            Func<Task> act = async () => await _productService.GetProductById(empty);
 
             //Assert
             //Перевірка, чи результат відповідає очікуваному
@@ -74,7 +74,7 @@ namespace Store.API.Tests.Tests.Services
             result.Description.Should().Be("apple test desc");
             result.ImageURL.Should().Be("testAppleImg");
             result.Price.Should().Be(10);
-            result.CategoryName.Should().Be("Fruit");   
+            result.CategoryName.Should().Be("Fruit");
 
             //Arrange
 
@@ -156,7 +156,7 @@ namespace Store.API.Tests.Tests.Services
             //Arrange
             var search = "pp";
             var id = Guid.NewGuid();
-            var product = Product.CreateProduct(id, "Apple", "apple test desc", "testAppleImg", 10, 
+            var product = Product.CreateProduct(id, "Apple", "apple test desc", "testAppleImg", 10,
                 new Guid(), "Fruit", new Guid(), "Fruit cool", 10, 1).Product;
 
             //Act
@@ -166,6 +166,67 @@ namespace Store.API.Tests.Tests.Services
             product.Id.Should().Be(id);
             product.Name.Should().Be("Apple");
         }
+        #endregion
+
+        #region GetProducts
+        [Fact]
+        public async Task GetProducts_ShouldThrowValidationException_WhenIdIsEmpty()
+        {
+            //Arrange
+            var empty = Guid.Empty;
+
+            //Act
+            Func<Task> act = async () => await _productService.GetProducts(empty);
+
+            //Assert
+            await act.Should().ThrowAsync<ValidationException>().WithMessage(ErrorMessages.GuidCannotBeEmpty);
+        }
+
+        [Fact]
+        public async Task GetProducts_ShouldNotFound_WhenProductsIsNullOrEmpty()
+        {
+            //Arrange
+            var catId = Guid.NewGuid();
+
+            //Act
+            Func<Task> act = async () => await _productService.GetProducts(catId);
+
+            //Assert
+            await act.Should().ThrowAsync<NotFound>().WithMessage(ErrorMessages.ProductNotFound);
+        }
+
+        [Fact]
+        public async Task GetProducts_ShouldReturnDTO_WhenProductsExists()
+        {
+            //Arrange
+            var productId = Guid.NewGuid();
+            var catId = Guid.NewGuid();
+            var products = new List<Product> { Product.CreateProduct(productId, "Apple", "Desc", "ImageURL", 10, catId,
+                "CatName", new Guid(), "BrandName", 10, 2).Product};
+
+            _categoryServiceMock.Setup(c => c.GetAllNestedCategoryIdsAndNames(catId))
+                .ReturnsAsync(new List<(Guid, string)> { (catId, "CatName") });
+
+            _productRepositoryMock.Setup(r => r.GetByCategoryIds(It.Is<IEnumerable<Guid>>(ids => ids.Contains(catId))))
+            .ReturnsAsync(products);
+
+            //Act
+            var result = await _productService.GetProducts(catId);
+
+            //Assert
+            result.First().Id.Should().Be(productId);
+            result.First().CategoryId.Should().Be(catId);
+            result.First().Name.Should().Be("Apple");
+        }
+        #endregion
+
+        #region GetFilteredProducts
+
+        #endregion
+
+        #region GetCountPages
+
+
         #endregion
         //Arrange
         //Підготовка: створення об'єктів, підстановка моків, налаштування вхідних даних.
