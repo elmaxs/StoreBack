@@ -222,10 +222,32 @@ namespace Store.API.Tests.Tests.Services
 
         #region GetFilteredProducts
 
+
         #endregion
 
         #region GetCountPages
 
+        [Fact]
+        public async Task GetCountPages_ShouldReturnCountPage()
+        {
+            //Arrange
+            var categoryId = Guid.NewGuid();
+
+            var product = Product.CreateProduct(Guid.NewGuid(), "TestProd", "TestDescProd", "TestImgProd", 100.5M, categoryId,
+                "TestCatName", Guid.NewGuid(), "TestBrandName", 10, 2).Product;
+
+            _categoryServiceMock.Setup(c => c.GetAllNestedCategoryIdsAndNames(categoryId))
+                .ReturnsAsync(new List<(Guid, string)> { (categoryId, product.CategoryName) });
+
+            _productRepositoryMock.Setup(p => p.GetByCategoryIds(It.Is<IEnumerable<Guid>>(ids => ids.Contains(categoryId))))
+                .ReturnsAsync(new List<Product> { product });
+
+            //Act
+            var result = await _productService.GetCountPages(categoryId);
+
+            //Assert
+            result.Should().Be(1);
+        }
 
         #endregion
         //Arrange
@@ -236,70 +258,3 @@ namespace Store.API.Tests.Tests.Services
         //Перевірка, чи результат відповідає очікуваному
     }
 }
-//public class ProductServiceTests
-//{
-//    private readonly Mock<IProductRepository> _productRepositoryMock;
-//    private readonly Mock<ICategoryService> _categoryServiceMock;
-//    private readonly ProductService _productService;
-
-//    public ProductServiceTests()
-//    {
-//        _productRepositoryMock = new Mock<IProductRepository>();
-//        _categoryServiceMock = new Mock<ICategoryService>();
-
-//        _productService = new ProductService(_productRepositoryMock.Object, _categoryServiceMock.Object);
-//    }
-
-//    [Fact]
-//    public async Task GetProductById_ShouldThrowValidationException_WhenIdIsEmpty()
-//    {
-//        // Arrange
-//        var emptyId = Guid.Empty;
-
-//        // Act
-//        Func<Task> act = async () => await _productService.GetProductById(emptyId);
-
-//        // Assert
-//        await act.Should().ThrowAsync<ValidationException>()
-//            .WithMessage(ErrorMessages.GuidCannotBeEmpty);
-//    }
-
-//    [Fact]
-//    public async Task GetProductById_ShouldThrowNotFound_WhenProductIsNull()
-//    {
-//        // Arrange
-//        var id = Guid.NewGuid();
-//        _productRepositoryMock.Setup(r => r.GetById(id)).ReturnsAsync((Product?)null);
-
-//        // Act
-//        Func<Task> act = async () => await _productService.GetProductById(id);
-
-//        // Assert
-//        await act.Should().ThrowAsync<NotFound>()
-//            .WithMessage(ErrorMessages.ProductNotFound);
-//    }
-
-//    [Fact]
-//    public async Task GetProductById_ShouldReturnDTO_WhenProductExists()
-//    {
-//        // Arrange
-//        var id = Guid.NewGuid();
-//        var product = Product.CreateProduct(
-//            id, "iPhone", "desc", "url", 999,
-//            Guid.NewGuid(), "Phones",
-//            Guid.NewGuid(), "Apple",
-//            100, 0
-//        ).Product;
-
-//        _productRepositoryMock.Setup(r => r.GetById(id)).ReturnsAsync(product);
-
-//        // Act
-//        var result = await _productService.GetProductById(id);
-
-//        // Assert
-//        result.Id.Should().Be(id);
-//        result.Name.Should().Be("iPhone");
-//        result.BrandName.Should().Be("Apple");
-//        result.CategoryName.Should().Be("Phones");
-//    }
-//}
