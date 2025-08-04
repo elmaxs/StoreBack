@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Store.Application.Services.User;
+using Store.Contracts.UserContracts.Request.ProductUserDTO;
 using Store.Core.Models;
 using Store.DataAccess;
 using Store.DataAccess.Entities;
@@ -198,6 +199,33 @@ namespace Store.API.Tests.Tests.IntegrationTests.Services
             result.Should().NotBeEmpty();
             result.First().Id.Should().Be(Product.Id);
         }
+        #endregion
+
+        #region GetFilteredProductsAsync
+
+        [Fact]
+        public async Task GetFilteredProductsAsync_ReturnListProducts()
+        {
+            //Arrange
+            var _productService = CreateServiceWithDb(out var _context);
+
+            InitialDefaultProps();
+
+            await _context.Categories.AddAsync(Category);
+            await _context.Brands.AddAsync(Brand);
+            await _context.Products.AddAsync(Product);
+
+            await _context.SaveChangesAsync();
+
+            var dto = new ProductFilterParams { CategoryId = Product.CategoryId };
+
+            //Act
+            var result = await _productService.GetFilteredProductsAsync(dto);
+
+            //Assert
+            result.First().Id.Should().Be(Product.Id);
+        }
+
         #endregion
     }
 }

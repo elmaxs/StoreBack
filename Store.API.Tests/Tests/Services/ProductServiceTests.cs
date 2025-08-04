@@ -2,6 +2,7 @@
 using Moq;
 using Store.Application.Abstractions.User;
 using Store.Application.Services.User;
+using Store.Contracts.UserContracts.Request.ProductUserDTO;
 using Store.Core.Abstractions.Repository;
 using Store.Core.Exceptions;
 using Store.Core.Models;
@@ -222,6 +223,46 @@ namespace Store.API.Tests.Tests.Services
 
         #region GetFilteredProducts
 
+        [Fact]
+        public async Task GetFilteredProducts_ShouldThorNotFound_WhenProductNotExists()
+        {
+            //Arrange
+            var categoryId = Guid.Empty;
+
+            //Act
+            Func<Task> act = async () => await _productService.GetFilteredProductsAsync(
+                new Contracts.UserContracts.Request.ProductUserDTO.ProductFilterParams { CategoryId = categoryId });
+
+            //Asert
+            await act.Should().ThrowAsync<NotFound>().WithMessage(ErrorMessages.ProductNotFound);
+        }
+
+        [Fact]
+        public async Task GetFilteredProducts_ShouldReturnProducts_WhenProductsExists()
+        {
+            //Arrange
+            var categoryId = Guid.NewGuid();
+
+            var dto = new ProductFilterParams { CategoryId = categoryId };
+
+            var product = Product.CreateProduct(Guid.NewGuid(), "TestProd", "TestDesc", "TestImg", 100.0M, categoryId,
+                "TestCat", Guid.NewGuid(), "testBrand", 10, 2).Product;
+
+            _categoryServiceMock.Setup(s => s.GetAllNestedCategoryIdsAndNames(categoryId)).ReturnsAsync(
+                new List<(Guid, string)> { (categoryId, "TestCat") });
+
+            _categoryServiceMock.Setup(s => s.CategoryHasProducts(categoryId)).ReturnsAsync(true);
+
+            _productRepositoryMock.Setup(s => s.GetFilteredProductsAsync(categoryId, dto.Sort, dto.Order, dto.Page, dto.PageSize))
+                .ReturnsAsync(new List<Product> { product });
+
+            //Act
+            var result = await _productService.GetFilteredProductsAsync(dto);
+
+            //Assert
+            result.First().Id.Should().Be(product.Id);
+            result.First().CategoryId.Should().Be(categoryId);
+        }
 
         #endregion
 
